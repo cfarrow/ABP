@@ -29,7 +29,7 @@ void Cubic4d::setNbrsWXYZ(size_t i)
 
 	/* populates the neighbor array */
 	size_t w_val, x_val, y_val, z_val;
-	w_val, x_val = y_val = z_val = 0;
+	w_val = x_val = y_val = z_val = 0;
 
     size_t len2 = length*length;
     size_t len3 = len2*length;
@@ -76,7 +76,7 @@ void Cubic4d::setNbrsXYZ(size_t i)
 
 	/* populates the neighbor array */
 	size_t w_val, x_val, y_val, z_val;
-	w_val, x_val = y_val = z_val = 0;
+	w_val = x_val = y_val = z_val = 0;
 
     size_t len2 = length*length;
     size_t len3 = len2*length;
@@ -127,7 +127,7 @@ void Cubic4d::setNbrsYZ(size_t i)
 
 	/* populates the neighbor array */
 	size_t w_val, x_val, y_val, z_val;
-	w_val, x_val = y_val = z_val = 0;
+	w_val = x_val = y_val = z_val = 0;
 
     size_t len2 = length*length;
     size_t len3 = len2*length;
@@ -181,7 +181,7 @@ void Cubic4d::setNbrsZ(size_t i)
 
 	/* populates the neighbor array */
 	size_t w_val, x_val, y_val, z_val;
-	w_val, x_val = y_val = z_val = 0;
+	w_val = x_val = y_val = z_val = 0;
 
     size_t len2 = length*length;
     size_t len3 = len2*length;
@@ -240,7 +240,7 @@ void Cubic4d::setNbrs0(size_t i)
 
 	/* populates the neighbor array */
 	size_t w_val, x_val, y_val, z_val;
-	w_val, x_val = y_val = z_val = 0;
+	w_val = x_val = y_val = z_val = 0;
 
     size_t len2 = length*length;
     size_t len3 = len2*length;
