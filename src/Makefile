@@ -26,7 +26,7 @@ RANDOBJS = CubRand.o FixedZ.o SquRand.o SWNetwork.o TriRand.o
 
 # program rules
 %: %.cpp $(OBJS)
-	$(LINK) $(CFLAGS) $^ -o $*
+	$(LINK) $(CFLAGS) $^ -o $*.out
 
 # library rules
 $(OBJS): MersenneTwister.h Lattice.h Lattice.cpp
