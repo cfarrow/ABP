@@ -1,7 +1,7 @@
 # CFLAGS
 OPTFLAGS = -fPIC -O3 -ffast-math -funroll-loops #-fno-inline 
 #OPTFLAGS = -O3 -funroll-loops #-fno-inline 
-DBGFLAGS = -gstabs+ -Wall
+DBGFLAGS = -g -Wall
 
 CC = g++
 LINK = g++
