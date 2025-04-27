@@ -13,14 +13,22 @@
 
 */
 
-#include <iostream>
 #include <cstdio>
-#include <vector>
+#include <iostream>
 #include <queue>
+#include <vector>
+
 #include "MersenneTwister.h"
 #include "Lattice.h"
 
-/* ==============================Lattice Class Functions========================================= */
+
+/* ==============================Utilities==================================== */
+
+inline static size_t bit_mask(size_t shift) {
+	return size_t{1} << shift;
+}
+
+/* ==============================Lattice Class Functions====================== */
 
 Lattice::Lattice(size_t nsites, size_t id) {
 		 
@@ -53,7 +61,7 @@ bool Lattice::isActive(size_t i) {
 	size_t word_num = (i-s) / word_size;
 	size_t word = active[ word_num ];
 
-	return (word & ( 1 << s ) ? 1 : 0);
+	return (word & bit_mask(s) ? 1 : 0);
 }
 
 bool Lattice::isPresent(size_t i) {
@@ -64,7 +72,7 @@ bool Lattice::isPresent(size_t i) {
 	size_t word_num = (i-s) / word_size;
 	size_t word = present[ word_num ];
 
-	return (word & ( 1 << s ) ? 1 : 0);
+	return (word & bit_mask(s) ? 1 : 0);
 }
 
 void Lattice::setActiveLevel(size_t i, bool new_level) {
@@ -74,12 +82,10 @@ void Lattice::setActiveLevel(size_t i, bool new_level) {
 	size_t word_num = (i-s) / word_size;
 
 	if( !new_level ) {
-		size_t mask = ~(1 << s);
-		active[word_num] &= mask;
+		active[word_num] &= ~bit_mask(s);
 	}
 	else {
-		size_t mask = 1 << s;
-		active[word_num] |= mask;
+		active[word_num] |= bit_mask(s);
 	}
 
 	/* Update the active neighbors.  */
@@ -100,12 +106,10 @@ void Lattice::setPresentLevel(size_t i, bool new_level) {
 	size_t word_num = (i-s) / word_size;
 
 	if( !new_level ) {
-		size_t mask = ~(1 << s);
-		present[word_num] &= mask;
+		present[word_num] &= ~bit_mask(s);
 	}
 	else {
-		size_t mask = 1 << s;
-		present[word_num] |= mask;
+		present[word_num] |= bit_mask(s);
 	}
 
 	/* Update the active neighbors.  */
@@ -173,7 +177,7 @@ Lattice::~Lattice() {
 void Lattice::activateSites(void) {
 	 
 	num_words = num_sites / word_size;
-	size_t ones = ~0;
+	static size_t ones = ~size_t{0}; // Every bit is 1
 	for( size_t i = 0; i < num_words; i++ ) {
 			active[i] = ones;
 			present[i] = ones;
