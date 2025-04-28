@@ -24,7 +24,7 @@
 
 /* ==============================Utilities==================================== */
 
-inline static size_t bit_mask(size_t shift) {
+inline size_t bit_mask(size_t shift) {
 	return size_t{1} << shift;
 }
 
