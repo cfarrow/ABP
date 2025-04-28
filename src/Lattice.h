@@ -30,8 +30,21 @@
 #include<algorithm>
 
 
+/* ============================= Utilities ================================== */
+
 // Size of a "word" representing multiple sites, one bit per site.
 const size_t word_size = 8 * sizeof (size_t);
+
+// Get a bit mask for manipulating the state of a location within a word
+size_t bit_mask(size_t shift);
+
+// Get the bit value at a specified site within an array of words
+bool get_site_value(size_t site_index, size_t* words);
+
+// Set the bit value at a specified site within an array of words
+void set_site_value(size_t site_index, bool value, size_t* words);
+
+/* ============================ Lattice Class Functions ===================== */
 
 class Lattice 
 {
