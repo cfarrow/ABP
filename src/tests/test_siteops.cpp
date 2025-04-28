@@ -15,7 +15,7 @@ const size_t shift_19 = 0b10000000000000000000;
 const size_t shift_41 = 0b100000000000000000000000000000000000000000;
 
 
-TEST(wordopsTest, test_bit_mask)
+TEST(siteOpsTest, test_bit_mask)
 {
     EXPECT_EQ(shift_3, bit_mask(3));
 
@@ -25,7 +25,7 @@ TEST(wordopsTest, test_bit_mask)
 }
 
 
-TEST(wordopsTest, test_get_site_value)
+TEST(siteOpsTest, test_get_site_value)
 {
     size_t* words = new size_t[8]{0, 0, 0, 0};
     size_t site_index;
@@ -45,7 +45,7 @@ TEST(wordopsTest, test_get_site_value)
     }
 }
 
-TEST(wordopsTest, test_set_site_value)
+TEST(siteOpsTest, test_set_site_value)
 {
     size_t* words = new size_t[8]{0, 0, 0, 0};
     size_t site_index;
@@ -90,6 +90,4 @@ TEST(wordopsTest, test_set_site_value)
         EXPECT_EQ(shift_19, words[2]);
         EXPECT_EQ(0, words[3]);
     }
-
-
 }
