@@ -22,13 +22,34 @@
 #include "Lattice.h"
 
 
-/* ==============================Utilities==================================== */
+/* ============================= Utilities ================================== */
 
 inline size_t bit_mask(size_t shift) {
+	// mask with 'word_size' bits, all zero except the bit at location 'shift'
 	return size_t{1} << shift;
 }
 
-/* ==============================Lattice Class Functions====================== */
+inline bool get_site_value(size_t site_index, size_t* words) {
+	size_t shift = site_index % word_size;
+	size_t word_num = (site_index - shift) / word_size;
+	size_t word = words[word_num];
+
+	return word & bit_mask(shift);
+}
+
+inline void set_site_value(size_t site_index, bool value, size_t* words) {
+	size_t shift = site_index % word_size;
+	size_t word_num = (site_index - shift) / word_size;
+
+	if(value) {
+		words[word_num] |= bit_mask(shift);
+	}
+	else {
+		words[word_num] &= ~bit_mask(shift);
+	}
+}
+
+/* ============================ Lattice Class Functions ===================== */
 
 Lattice::Lattice(size_t nsites, size_t id) {
 		 
@@ -54,42 +75,20 @@ Lattice::Lattice(size_t nsites, size_t id) {
 }
 
 bool Lattice::isActive(size_t i) {
-
-	/* word location  */
-	size_t s = i % word_size;
-	/* word number */
-	size_t word_num = (i-s) / word_size;
-	size_t word = active[ word_num ];
-
-	return (word & bit_mask(s) ? 1 : 0);
+	return get_site_value(i, active);
 }
 
 bool Lattice::isPresent(size_t i) {
-
-	/* word location  */
-	size_t s = i % word_size;
-	/* word number */
-	size_t word_num = (i-s) / word_size;
-	size_t word = present[ word_num ];
-
-	return (word & bit_mask(s) ? 1 : 0);
+	return get_site_value(i, present);
 }
 
 void Lattice::setActiveLevel(size_t i, bool new_level) {
 
-	bool old_level = isActive(i);
-	size_t s = i % word_size;
-	size_t word_num = (i-s) / word_size;
-
-	if( !new_level ) {
-		active[word_num] &= ~bit_mask(s);
-	}
-	else {
-		active[word_num] |= bit_mask(s);
-	}
+	bool old_level = get_site_value(i, active);
+	set_site_value(i, new_level, active);
 
 	/* Update the active neighbors.  */
-	if( new_level  && !old_level ) { 
+	if( new_level && !old_level ) { 
 		num_active_sites++;
 	}
 	else if( !new_level && old_level ) { 
@@ -101,19 +100,11 @@ void Lattice::setActiveLevel(size_t i, bool new_level) {
 
 void Lattice::setPresentLevel(size_t i, bool new_level) {
 
-	bool old_level = isPresent(i);
-	size_t s = i % word_size;
-	size_t word_num = (i-s) / word_size;
-
-	if( !new_level ) {
-		present[word_num] &= ~bit_mask(s);
-	}
-	else {
-		present[word_num] |= bit_mask(s);
-	}
+	bool old_level = get_site_value(i, present);
+	set_site_value(i, new_level, present);
 
 	/* Update the active neighbors.  */
-	if( new_level  && !old_level ) { 
+	if( new_level && !old_level ) { 
 		num_present_sites++;
 	}
 	else if( !new_level && old_level ) { 

@@ -29,6 +29,8 @@
 #include<vector>
 #include<algorithm>
 
+
+// Size of a "word" representing multiple sites, one bit per site.
 const size_t word_size = 8 * sizeof (size_t);
 
 class Lattice 
