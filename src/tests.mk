@@ -3,9 +3,7 @@
 #   make TARGET - makes the given target.
 
 # All tests produced by this Makefile.  Add new tests here and deps below.
-TESTS = test_wordops
-
-test_wordops.o : MersenneTwister.h Lattice.h Lattice.cpp
+TESTS = test_siteops
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.

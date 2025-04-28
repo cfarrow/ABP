@@ -43,6 +43,8 @@ TEST(siteOpsTest, test_get_site_value)
         words[1] |= shift_41;
         EXPECT_EQ(true, get_site_value(site_index, words));
     }
+
+    delete [] words;
 }
 
 TEST(siteOpsTest, test_set_site_value)
