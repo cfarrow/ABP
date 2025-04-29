@@ -82,8 +82,9 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
-	MTRand(7);
-	MTRand mtRNG;
+
+	MTRand();
+	MTRand mtRNG(7);
 	for( size_t smpl = 0; smpl < num_samples; smpl++ ) {
 		k = 0;
 		t = 0;
