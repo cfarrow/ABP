@@ -84,6 +84,9 @@ cover/
 # Cython debug symbols
 cython_debug/
 
+# uv
+uv.lock
+
 ## Misc
 .vscode
-.dat
+*.dat
