@@ -1,8 +1,18 @@
 [build-system]
-requires = ["setuptools", "cython"]
+requires = [
+    "setuptools", 
+    "cython",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "ABPy"
 version = "0.1.0"
-dependencies = []
+requires-python = ">= 3.8"
+classifiers = ["Private :: No Not Upload"]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+ext-modules = [
+    {name = "ABPy.triangular_lattice", sources = ["./bindings/triangular_lattice.pyx"]},
+]
