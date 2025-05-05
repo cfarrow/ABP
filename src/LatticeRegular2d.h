@@ -13,16 +13,25 @@
 #ifndef LATTICEREGULAR2D_H
 #define LATTICEREGULAR2D_H
 
+#include <cmath>
 #include "LatticeRegular.h"
+
 
 class LatticeRegular2d: public LatticeRegular
 {
     public:
-         LatticeRegular2d(size_t len, size_t id = 0) : LatticeRegular( len*len, id ) {}
-         virtual ~LatticeRegular2d() {}
+        LatticeRegular2d(size_t len, size_t id = 0, size_t nn = 0)
+        : LatticeRegular(len*len, id) {
+           length = static_cast< size_t >(ceil(sqrt(num_sites)));
+           num_neighbors = nn;
+           nbrs.resize(num_neighbors);
+           last = num_sites;
 
-         /* virtual functions */
-         virtual bool isSpanning(size_t = 1);
+        }
+        virtual ~LatticeRegular2d() {}
+
+        /* virtual functions */
+        virtual bool isSpanning(size_t = 1);
 
 };
 

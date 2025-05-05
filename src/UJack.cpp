@@ -1,23 +1,4 @@
 #include "UJack.h"
-#include <vector>
-#include <cmath>
-
-void UJack::Setup(short pbc)
-{
-    /* If num_sites was changed in the constructor, this makes sure that
-     * length is properly defined.
-     */
-    length = static_cast< size_t >( ceil(sqrt(num_sites)) );
-    num_neighbors = 8;
-    nbrs.resize(num_neighbors);
-    last = num_sites;
-
-    /* Set the boundary conditions and set the correct setNbrs function */
-    PBC = pbc;
-    if( PBC >= 2 ) setNbrs = (LRFptr) &UJack::setNbrsXY;
-    else if (PBC == 1) setNbrs = (LRFptr) &UJack::setNbrsY;
-    else setNbrs = (LRFptr) &UJack::setNbrs0;
-}
 
 
 /* For regular graphs, the convention is to create an array of neighbors
@@ -26,17 +7,18 @@ void UJack::Setup(short pbc)
  * will not work with random graphs, however.
  * THIS IS NOT DEFINED IN LATTICE_H SINCE IT IS SPECIFIC TO REGULAR GRAPHS.
  */
-void UJack::setNbrsXY(size_t i) 
+template<>
+size_t UJack<2>::getNumNeighbors(size_t) {
+    return 8; 
+}
+
+
+template<>
+void UJack<2>::setNbrs(size_t i) 
 {
-    /* If periodic boundary conditions are to be added, this is the place! */
-
-	/* populates the neighbor array */
-	size_t x_val, y_val;
-	x_val = y_val = 0;
-
     /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( i - x_val ) / length;
+    size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
 
     /* right, x + 1 */
     nbrs[0] = ( x_val + 1 ) % length + y_val * length;
@@ -67,15 +49,21 @@ void UJack::setNbrsXY(size_t i)
 /* PBC in one direction:
  * We check whether the x-value is 0 or length-1. If it is then we don't
  * connect the neighbor to the left (for 0) or right (for length-1)   */
-void UJack::setNbrsY(size_t i) 
+template<>
+size_t UJack<1>::getNumNeighbors(size_t i) {
+	size_t x_val = i % length;
+    size_t nn = 8;
+    if(x_val == 0 || x_val == length-1) nn -= 3;
+    return nn;
+}
+
+
+template<>
+void UJack<1>::setNbrs(size_t i) 
 {
-
-	/* populates the neighbor array */
-	size_t x_val = 0, y_val = 0;
-
     /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( i - x_val ) / length;
+    size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
 
     nbrs.clear();
 
@@ -124,15 +112,29 @@ void UJack::setNbrsY(size_t i)
  * It is helpful to visualize the lattice extending from [0,0] to
  * the right and up.
  * */
-void UJack::setNbrs0(size_t i) 
+template<>
+size_t UJack<0>::getNumNeighbors(size_t i) {
+	size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
+    size_t nn = 8;
+
+    bool x_boundary = (x_val == 0 || x_val == length-1);
+    bool y_boundary = (y_val == 0 || y_val == length-1);
+
+    if(x_boundary) nn -= 3;
+    if(y_boundary) nn -= 3;
+    // If we're in a corner, then we counted a diagonal neighbor twice
+    if(x_boundary && y_boundary) nn += 1;
+    return nn;
+}
+
+
+template<>
+void UJack<0>::setNbrs(size_t i) 
 {
-
-	/* populates the neighbor array */
-	size_t x_val = 0, y_val = 0;
-
     /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( i - x_val ) / length;
+    size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
 
     nbrs.clear();
 
@@ -176,3 +178,9 @@ void UJack::setNbrs0(size_t i)
         nbrs.push_back( ( x_val - 1 ) + ( y_val - 1 ) * length );
     }
 }
+
+
+// Let the compiler know we want these
+template class UJack<0>;
+template class UJack<1>;
+template class UJack<2>;

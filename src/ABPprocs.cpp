@@ -260,27 +260,60 @@ void GraphInfo::printGraphInfo( ostream &ostr, size_t &nsites, size_t &mcull, si
 
 Lattice* GraphInfo::getLattice(size_t len) {
 	
+	Lattice* Lat;
 	switch( type ) {
 		case HEX_LATTICE:
-			return new Hexagonal(len, type, pbc);
+			switch(pbc){
+				case 0: Lat = new Hexagonal<0>(len, type); break;
+				case 1: Lat = new Hexagonal<1>(len, type); break;
+				case 2: Lat = new Hexagonal<2>(len, type); break;
+			}
 			break;
 		case SQU_LATTICE:
-			return new Square(len, type, pbc);
+			switch(pbc){
+				case 0: Lat = new Square<0>(len, type); break;
+				case 1: Lat = new Square<1>(len, type); break;
+				case 2: Lat = new Square<2>(len, type); break;
+			}
 			break;
 		case TRI_LATTICE:
-			return new Triangular(len, type, pbc);
+			switch(pbc){
+				case 0: Lat = new Triangular<0>(len, type); break;
+				case 1: Lat = new Triangular<1>(len, type); break;
+				case 2: Lat = new Triangular<2>(len, type); break;
+			}
 			break;
 		case JAK_LATTICE:
-			return new UJack(len, type, pbc);
+			switch(pbc){
+				case 0: Lat = new UJack<0>(len, type); break;
+				case 1: Lat = new UJack<1>(len, type); break;
+				case 2: Lat = new UJack<2>(len, type); break;
+			}
 			break;
 		case CUB_LATTICE:
-			return new Cubic(len, type, pbc);
+			switch(pbc){
+				case 0: Lat = new Cubic<0>(len, type); break;
+				case 1: Lat = new Cubic<1>(len, type); break;
+				case 2: Lat = new Cubic<2>(len, type); break;
+				case 3: Lat = new Cubic<3>(len, type); break;
+			}
 			break;
 		case BCC_LATTICE:
-			return new BCC(len, type, pbc);
+			switch(pbc){
+				case 0: Lat = new BCC<0>(len, type); break;
+				case 1: Lat = new BCC<1>(len, type); break;
+				case 2: Lat = new BCC<2>(len, type); break;
+				case 3: Lat = new BCC<3>(len, type); break;
+			}
 			break;
 		case C4D_LATTICE:
-			return new Cubic4d(len, type, pbc);
+			switch(pbc){
+				case 0: Lat = new Cubic4d<0>(len, type); break;
+				case 1: Lat = new Cubic4d<1>(len, type); break;
+				case 2: Lat = new Cubic4d<2>(len, type); break;
+				case 3: Lat = new Cubic4d<3>(len, type); break;
+				case 4: Lat = new Cubic4d<4>(len, type); break;
+			}
 			break;
 		case FIZ_LATTICE:
 			return new FixedZ(len, type, coord);
@@ -300,6 +333,7 @@ Lattice* GraphInfo::getLattice(size_t len) {
         default:
             return NULL;
 	}
+	return Lat;
 }
 
 /* Process command line arguments 

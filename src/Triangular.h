@@ -7,22 +7,17 @@
 
 #include "LatticeRegular2d.h"
 
+
+template<short pbc>
 class Triangular: public LatticeRegular2d
 {
     public:
-         Triangular(size_t len, size_t id = 0, short pbc = 2) : LatticeRegular2d( len, id ) 
-         {
-             Setup(pbc);
-         }
-         virtual ~Triangular() {}
+        Triangular(size_t len, size_t id = 0) : LatticeRegular2d(len, id, 6) {}
+        virtual ~Triangular() {}
+        virtual size_t getNumNeighbors(size_t);
 
     protected:
-         short PBC;
-         void Setup(short pbc = 2);
-         void setNbrs0(size_t); /* no PBC */
-         void setNbrsY(size_t); /* PBC in y-direction */
-         void setNbrsXY(size_t); /* PBC in both directions */
-
+        virtual void setNbrs(size_t);
 };
 
 #endif

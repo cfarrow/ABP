@@ -1,34 +1,19 @@
 #include "Square.h"
-#include <vector>
-#include <cmath>
-
-void Square::Setup(short pbc)
-{
-    /* If num_sites was changed in the constructor, this makes sure that
-     * length is properly defined.
-     */
-    length = static_cast< size_t >( ceil(sqrt(num_sites)) );
-    num_neighbors = 4;
-    nbrs.resize(num_neighbors);
-    last = num_sites;
-
-    // Set the function that will return the neighbors
-    PBC = pbc;
-    if( PBC >= 2 ) setNbrs = (LRFptr) &Square::setNbrsXY;
-    else if( PBC == 1) setNbrs =  (LRFptr) &Square::setNbrsY;
-    else setNbrs = (LRFptr) &Square::setNbrs0;
-}
 
 
 /* PBC in both directions */
-void Square::setNbrsXY(size_t i) 
-{
-	/* populates the neighbor array */
-	size_t x_val = 0, y_val = 0;
 
+template<>
+size_t Square<2>::getNumNeighbors(size_t) {
+    return 4; 
+}
+
+
+template<>
+void Square<2>::setNbrs(size_t i) {
     /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( i - x_val ) / length;
+    size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
 
     /* right, x + 1 */
     nbrs[0] = ( x_val + 1 ) % length + y_val * length;
@@ -46,14 +31,21 @@ void Square::setNbrsXY(size_t i)
 /* PBC in one direction:
  * We check whether the x-value is 0 or length-1. If it is then we don't
  * connect the neighbor to the left (for 0) or right (for length-1)   */
-void Square::setNbrsY(size_t i) 
-{
-	/* populates the neighbor array */
-	size_t x_val = 0, y_val = 0;
 
+template<>
+size_t Square<1>::getNumNeighbors(size_t i) {
+	size_t x_val = i % length;
+    size_t nn = 4;
+    if(x_val == 0 || x_val == length-1) nn -= 1;
+    return nn;
+}
+
+
+template<>
+void Square<1>::setNbrs(size_t i) {
     /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( i - x_val ) / length;
+    size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
 
     nbrs.clear();
 
@@ -81,14 +73,24 @@ void Square::setNbrsY(size_t i)
  * It is helpful to visualize the lattice extending from [0,0] to
  * the right and up.
  * */
-void Square::setNbrs0(size_t i) 
-{
-	/* populates the neighbor array */
-	size_t x_val = 0, y_val = 0;
 
+template<>
+size_t Square<0>::getNumNeighbors(size_t i) {
+    size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
+
+    size_t nn = 4;
+    if(x_val == 0 || x_val == length-1) nn -= 1;
+    if(y_val == 0 || y_val == length-1) nn -= 1;
+    return nn;
+}
+
+
+template<>
+void Square<0>::setNbrs(size_t i) {
     /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( i - x_val ) / length;
+    size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
 
     nbrs.clear();
 
@@ -112,3 +114,9 @@ void Square::setNbrs0(size_t i)
         nbrs.push_back( x_val + ( y_val - 1 ) * length );
     }
 }
+
+
+// Let the compiler know we want these
+template class Square<0>;
+template class Square<1>;
+template class Square<2>;

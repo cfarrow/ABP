@@ -3,390 +3,305 @@
 */
 
 #include "BCC.h"
-#include <vector>
-#include <cmath>
 
-void BCC::Setup( short pbc )
-{
-    /* If num_sites was changed in the constructor, this makes sure that
-     * length is properly defined.
-     */
-    length = static_cast< size_t >( ceil( pow(num_sites, 1.0/3.0)) );
-    num_neighbors = 8;
-    nbrs.resize(num_neighbors);
-    last = num_sites;
+/* 
+A BCC lattice comprises two intercalated cubic sub-lattices. We call them A and
+B. Sub-lattice A has z values that are even and sub-lattice B has z values that
+are odd. Any site on lattice A is at the center of a 8 sites on lattice B (it's
+at the center of the cubic body, hence BCC).
 
-    /* Set the boundary conditions and set the correct setNbrs function */
-    PBC = pbc;
-    if( PBC >= 3 ) setNbrs = (LRFptr) &BCC::setNbrsXYZ;
-    else if( PBC == 2 ) setNbrs = (LRFptr) &BCC::setNbrsYZ;
-    else if( PBC == 1 ) setNbrs = (LRFptr) &BCC::setNbrsZ;
-    else setNbrs = (LRFptr) &BCC::setNbrs0;
+If on sublattice 'A' (z even) the neighbors are:
+x-1      y-1     z+/-1
+x-1      y       z+/-1
+x        y-1     z+/-1
+x        y       z+/-1
 
-}
+If on sublattice 'B' (z odd) the neighbors are:
+x        y       z+/-1
+x        y+1     z+/-1
+x+1      y       z+/-1
+x+1      y+1     z+/-1
 
+It's helpful later to define which sites are on a face for determining boundary
+conditions.
+
+x         | y         | z         | lattice
+----------------------------------------------
+0         | y         | even      | A
+x         | 0         | even      | A
+x         | y         | 0         | A
+length-1  | y         | odd       | B
+x         | length-1  | odd       | B
+x         | y         | length-1  | B
+
+A site can be on an edge or a corner if more than one condition is satisfied.
+*/
+
+// X and Y shifts on the B lattice to get to neighbors.
+// The A shifts are the negative of these.
+static const short B_shifts[4][2] = {
+    {0, 0},
+    {0, 1},
+    {1, 0},
+    {1, 1},
+};
 
 /* PBC in all directions */
-void BCC::setNbrsXYZ(size_t i) 
-{
-    /* If periodic boundary conditions are to be added, this is the place! */
 
-	/* populates the neighbor array */
-	size_t x_val, y_val, z_val;
-    static size_t len2 = length*length;
-	x_val = y_val = z_val = 0;
-
-    /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( (i - x_val)/length ) % length;
-    z_val = (i - x_val - y_val*length) / ( length * length );
-
-    /* Consider the inner bcc sublattice placed on the same half-spaced grid as
-     * the other. The bcc bonds are not all equal length, but this does not
-     * matter in percolation.
-     *
-     * If on sublattice 'A' (z odd) the neighbors are:
-     * x        y       z+/-1
-     * x        y+1     z+/-1
-     * x+1      y       z+/-1
-     * x+1      y+1     z+/-1
-     *
-     * If on sublattice 'B' (z even) the neighbors are:
-     * x-1      y-1     z+/-1
-     * x-1      y       z+/-1
-     * x        y-1     z+/-1
-     * x        y       z+/-1
-     */
-
-    /* x, y, z+1 */
-    nbrs[0] = x_val + y_val*length + ((z_val+1)%length)*len2;
-    
-    /* x, y, z-1 */
-    nbrs[1] = x_val + y_val*length + ((z_val-1+length)%length)*len2;
-
-    if( z_val %2 )
-    {
-        /* x, y+1, z+1 */
-        nbrs[2] = x_val + ((y_val+1)%length)*length + ((z_val+1)%length)*len2;
-        
-        /* x, y+1, z-1 */
-        nbrs[3] = x_val + ((y_val+1)%length)*length + ((z_val-1+length)%length)*len2;
-
-        /* x+1, y, z+1 */
-        nbrs[4] = (x_val+1)%length + y_val*length + ((z_val+1)%length)*len2;
-        
-        /* x+1, y, z-1 */
-        nbrs[5] = (x_val+1)%length + y_val*length + ((z_val-1+length)%length)*len2;
-        
-        /* x+1, y+1, z+1 */
-        nbrs[6] = (x_val+1)%length + ((y_val+1)%length)*length + ((z_val+1)%length)*len2;
-        
-        /* x+1, y+1, z-1 */
-        nbrs[7] = (x_val+1)%length + ((y_val+1)%length)*length + ((z_val-1+length)%length)*len2;
-
-    }
-
-    else
-    {
-        /* x-1, y-1, z+1 */
-        nbrs[2] = (x_val-1+length)%length + ((y_val-1+length)%length)*length + ((z_val+1)%length)*len2;
-
-        /* x-1, y-1, z-1 */
-        nbrs[3] = (x_val-1+length)%length + ((y_val-1+length)%length)*length + ((z_val-1+length)%length)*len2;
-        
-        /* x-1, y, z+1 */
-        nbrs[4] = (x_val-1+length)%length + y_val*length + ((z_val+1)%length)*len2;
-        
-        /* x-1, y, z-1 */
-        nbrs[5] = (x_val-1+length)%length + y_val*length + ((z_val-1+length)%length)*len2;
-
-        /* x, y-1, z+1 */
-        nbrs[6] = x_val + ((y_val-1+length)%length)*length + ((z_val+1)%length)*len2;
-        
-        /* x, y-1, z-1 */
-        nbrs[7] = x_val + ((y_val-1+length)%length)*length + ((z_val-1+length)%length)*len2;
-
-    }
-    
+template<>
+size_t BCC<3>::getNumNeighbors(size_t) {
+    return 8;
 }
 
-/* PBC in two directions: 
- * If x_val == 0, don't connect to "x_val-1" neighbors.
- * If x_val == length - 1, don't connect to "x_val+1" neighbors.
- */
-void BCC::setNbrsYZ(size_t i) 
+
+template <>
+void BCC<3>::setNbrs(size_t i) 
 {
-
-	/* populates the neighbor array */
-	size_t x_val = 0, y_val = 0, z_val = 0;
-    static size_t len2 = length*length;
-
     /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( (i - x_val)/length ) % length;
-    z_val = (i - x_val - y_val*length) / len2;
+    size_t x_val = i % length;
+    size_t y_val = ( (i - x_val)/length ) % length;
+    size_t z_val = (i - x_val - y_val*length) / length2;
+
+    bool is_A = z_val % 2 == 0;
+    int m = is_A ? -1 : 1;  // Multiply by -1 for A lattice
+    short sx, sy;
+    size_t x_new, y_new, z_new;
+
+    for(int j=0; j<4; j++)
+    {
+        sx = m * B_shifts[j][0];
+        sy = m * B_shifts[j][1];
+
+        x_new = (x_val + sx + length) % length;
+        y_new = (y_val + sy + length) % length;
+
+        z_new = (z_val - 1 + length) % length;
+        nbrs[2*j] = x_new + y_new * length + z_new * length2;
+
+        z_new = (z_val + 1) % length;
+        nbrs[2*j + 1] = x_new + y_new * length + z_new * length2;
+    }
+}
+
+// PBC in X and Y directions. The lattice has a face.
+
+template<>
+size_t BCC<2>::getNumNeighbors(size_t i) {
+    size_t x_val = i % length;
+    size_t y_val = ( (i - x_val)/length ) % length;
+    size_t z_val = (i - x_val - y_val*length) / length2;
+
+    bool is_A = z_val % 2 == 0;
+    bool botm_face = is_A && z_val == 0;
+    bool top_face = !is_A && z_val == length - 1;
+
+    if(botm_face || top_face) return 4;
+    return 8;
+}
+
+
+template <>
+void BCC<2>::setNbrs(size_t i) 
+{
+    /* Get the coordinates of the lattice site */
+    size_t x_val = i % length;
+    size_t y_val = ( (i - x_val)/length ) % length;
+    size_t z_val = (i - x_val - y_val*length) / length2;
+
+    bool is_A = z_val % 2 == 0;
+    int m = is_A ? -1 : 1;  // Multiply by -1 for A lattice
+    short sx, sy;
+    size_t x_new, y_new, z_new;
+    
+    bool botm_face = is_A && z_val == 0;
+    bool top_face = !is_A && z_val == length - 1;
+
+    nbrs.clear();
+    for(int j=0; j<4; j++)
+    {
+        sx = m * B_shifts[j][0];
+        sy = m * B_shifts[j][1];
+
+        x_new = (x_val + sx + length) % length;
+        y_new = (y_val + sy + length) % length;
+
+        if(!botm_face)
+        {
+            z_new = (z_val - 1 + length) % length;
+            nbrs.push_back(x_new + y_new * length + z_new * length2);
+        }
+
+        if(!top_face)
+        {
+            z_new = (z_val + 1) % length;
+            nbrs.push_back(x_new + y_new * length + z_new * length2);
+        }
+    }
+}
+
+
+// PBC in X direction only. The structure has faces and edges.
+
+template<>
+size_t BCC<1>::getNumNeighbors(size_t i) {
+    size_t x_val = i % length;
+    size_t y_val = ( (i - x_val)/length ) % length;
+    size_t z_val = (i - x_val - y_val*length) / length2;
+
+    bool is_A = z_val % 2 == 0;
+    bool botm_face = is_A && z_val == 0;
+    bool top_face = !is_A && z_val == length - 1;
+    bool front_face = is_A && y_val == 0;
+    bool back_face = !is_A && y_val == length - 1;
+
+    int num_faces = botm_face + front_face + top_face + back_face;
+
+    switch (num_faces) {
+        case 2:
+            return 2;
+            break;
+        case 1:
+            return 4;
+            break;
+        default:
+            return 8;
+            break;
+    }
+}
+
+
+template<>
+void BCC<1>::setNbrs(size_t i) 
+{
+    /* Get the coordinates of the lattice site */
+    size_t x_val = i % length;
+    size_t y_val = ( (i - x_val)/length ) % length;
+    size_t z_val = (i - x_val - y_val*length) / length2;
+
+    bool is_A = z_val % 2 == 0;
+    int m = is_A ? -1 : 1;  // Multiply by -1 for A lattice
+    short sx, sy;
+    size_t x_new, y_new, z_new;
+    
+    bool botm_face = is_A && z_val == 0;
+    bool top_face = !is_A && z_val == length - 1;
+    bool front_face = is_A && y_val == 0;
+    bool back_face = !is_A && y_val == length - 1;
 
     nbrs.clear();
 
-    /* x, y, z+1 */
-    nbrs.push_back( x_val + y_val*length + ((z_val+1)%length)*len2 );
-    
-    /* x, y, z-1 */
-    nbrs.push_back( x_val + y_val*length + ((z_val-1+length)%length)*len2 );
-
-    if( z_val %2 )
+    for(int j=0; j<4; j++)
     {
-        /* x, y+1, z+1 */
-        nbrs.push_back( x_val + ((y_val+1)%length)*length + ((z_val+1)%length)*len2 );
-        
-        /* x, y+1, z-1 */
-        nbrs.push_back( x_val + ((y_val+1)%length)*length + ((z_val-1+length)%length)*len2 );
+        sx = m * B_shifts[j][0];
+        sy = m * B_shifts[j][1];
 
-        if( x_val != length - 1)
+        x_new = (x_val + sx + length) % length;
+        y_new = (y_val + sy + length) % length;
+
+        // Boundary conditions for A sublattice
+        if(!botm_face && !(front_face && sy == -1))
         {
-            /* x+1, y, z+1 */
-            nbrs.push_back( x_val + y_val*length + ((z_val+1)%length)*len2 );
-            
-            /* x+1, y, z-1 */
-            nbrs.push_back( x_val + y_val*length + ((z_val-1+length)%length)*len2 );
-            
-            /* x+1, y+1, z+1 */
-            nbrs.push_back( x_val + ((y_val+1)%length)*length + ((z_val+1)%length)*len2 );
-            
-            /* x+1, y+1, z-1 */
-            nbrs.push_back( x_val + ((y_val+1)%length)*length + ((z_val-1+length)%length)*len2 );
+            z_new = (z_val - 1 + length) % length;
+            nbrs.push_back(x_new + y_new * length + z_new * length2);
         }
 
-    }
-
-    else
-    {
-
-        if( x_val != 0 )
+        // Boundary conditions for B sublattice
+        if(!top_face && !(back_face && sy == 1))
         {
-            /* x-1, y-1, z+1 */
-            nbrs.push_back( x_val-1 + ((y_val-1+length)%length)*length + ((z_val+1)%length)*len2 );
-
-            /* x-1, y-1, z-1 */
-            nbrs.push_back( x_val-1 + ((y_val-1+length)%length)*length + ((z_val-1+length)%length)*len2 );
-            
-            /* x-1, y, z+1 */
-            nbrs.push_back( x_val-1 + y_val*length + ((z_val+1)%length)*len2 );
-            
-            /* x-1, y, z-1 */
-            nbrs.push_back( x_val-1 + y_val*length + ((z_val-1+length)%length)*len2 );
+            z_new = (z_val + 1) % length;
+            nbrs.push_back(x_new + y_new * length + z_new * length2);
         }
-
-        /* x, y-1, z+1 */
-        nbrs.push_back( x_val + ((y_val-1+length)%length)*length + ((z_val+1)%length)*len2 );
-        
-        /* x, y-1, z-1 */
-        nbrs.push_back( x_val + ((y_val-1+length)%length)*length + ((z_val-1+length)%length)*len2 );
-
     }
-
 }
 
-/* PBC in one direction: 
- * PBC in two directions: 
- * If x_val == 0, don't connect to "x_val-1" neighbors.
- * If x_val == length - 1, don't connect to "x_val+1" neighbors.
- * If y_val == 0, don't connect to "y_val-1" neighbors.
- * If y_val == length - 1, don't connect to "y_val+1" neighbors.
- */
-void BCC::setNbrsZ(size_t i) 
+
+// No PBC. The lattice has faces, edges, and corners.
+
+template<>
+size_t BCC<0>::getNumNeighbors(size_t i) {
+    size_t x_val = i % length;
+    size_t y_val = ( (i - x_val)/length ) % length;
+    size_t z_val = (i - x_val - y_val*length) / length2;
+
+    bool is_A = z_val % 2 == 0;
+    bool botm_face = is_A && z_val == 0;
+    bool top_face = !is_A && z_val == length - 1;
+    bool front_face = is_A && y_val == 0;
+    bool back_face = !is_A && y_val == length - 1;
+    bool left_face = is_A && x_val == 0;
+    bool right_face = !is_A && x_val == length - 1;
+
+    // A point can only be on a single sub-lattice, so we can sum the conditions
+    // to determine if a point is on a corner, edge, face, or body.
+    int num_faces = botm_face + front_face + left_face +
+                    top_face + back_face + right_face;
+
+    switch(num_faces){
+        case 3:
+            return 1;
+            break;
+        case 2:
+            return 2;
+            break;
+        case 1:
+            return 4;
+            break;
+        default:
+            return 8;
+            break;
+    }
+}
+
+
+template<>
+void BCC<0>::setNbrs(size_t i) 
 {
 
-	/* populates the neighbor array */
-	size_t x_val = 0, y_val = 0, z_val = 0;
-    static size_t len2 = length*length;
-
     /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( (i - x_val)/length ) % length;
-    z_val = (i - x_val - y_val*length) / len2;
+    size_t x_val = i % length;
+    size_t y_val = ( (i - x_val)/length ) % length;
+    size_t z_val = (i - x_val - y_val*length) / length2;
+
+    bool is_A = z_val % 2 == 0;
+    int m = is_A ? -1 : 1;  // Multiply by -1 for A lattice
+    short sx, sy;
+    size_t x_new, y_new, z_new;
+    
+    bool botm_face = is_A && z_val == 0;
+    bool top_face = !is_A && z_val == length - 1;
+    bool front_face = is_A && y_val == 0;
+    bool back_face = !is_A && y_val == length - 1;
+    bool left_face = is_A && x_val == 0;
+    bool right_face = !is_A && x_val == length - 1;
 
     nbrs.clear();
-
-    /* x, y, z+1 */
-    nbrs.push_back( x_val + y_val*length + ((z_val+1)%length)*len2 );
-    
-    /* x, y, z-1 */
-    nbrs.push_back( x_val + y_val*length + ((z_val-1+length)%length)*len2 );
-
-    if( z_val %2 )
+    for(int j=0; j<4; j++)
     {
-        if( y_val != length - 1 )
+        sx = m * B_shifts[j][0];
+        sy = m * B_shifts[j][1];
+
+        x_new = (x_val + sx + length) % length;
+        y_new = (y_val + sy + length) % length;
+
+        // Boundary conditions for A sublattice
+        if(!botm_face && !(front_face && sy == -1) && !(left_face && sx == -1))
         {
-            /* x, y+1, z+1 */
-            nbrs.push_back( x_val + (y_val+1)*length + ((z_val+1)%length)*len2 );
-            
-            /* x, y+1, z-1 */
-            nbrs.push_back( x_val + (y_val+1)*length + ((z_val-1+length)%length)*len2 );
+            z_new = (z_val - 1 + length) % length;
+            nbrs.push_back(x_new + y_new * length + z_new * length2);
         }
 
-        if( x_val != length - 1)
+        // Boundary conditions for B sublattice
+        if(!top_face && !(back_face && sy == 1) && !(right_face && sx == 1))
         {
-            /* x+1, y, z+1 */
-            nbrs.push_back( x_val + y_val*length + ((z_val+1)%length)*len2 );
-            
-            /* x+1, y, z-1 */
-            nbrs.push_back( x_val + y_val*length + ((z_val-1+length)%length)*len2 );
-            
-            if( y_val != length - 1 )
-            {
-                /* x+1, y+1, z+1 */
-                nbrs.push_back( x_val + (y_val+1)*length + ((z_val+1)%length)*len2 );
-                
-                /* x+1, y+1, z-1 */
-                nbrs.push_back( x_val + (y_val+1)*length + ((z_val-1+length)%length)*len2 );
-            }
-        }
-
-    }
-
-    else
-    {
-
-        if( x_val != 0 )
-        {
-            if( y_val != 0 ) {
-                /* x-1, y-1, z+1 */
-                nbrs.push_back( x_val-1 + (y_val-1)*length + ((z_val+1)%length)*len2 );
-
-                /* x-1, y-1, z-1 */
-                nbrs.push_back( x_val-1 + (y_val-1)*length + ((z_val-1+length)%length)*len2 );
-                
-            }
-
-            /* x-1, y, z+1 */
-            nbrs.push_back( x_val-1 + y_val*length + ((z_val+1)%length)*len2 );
-            
-            /* x-1, y, z-1 */
-            nbrs.push_back( x_val-1 + y_val*length + ((z_val-1+length)%length)*len2 );
-        }
-
-        if( y_val != 0 ) {
-            /* x, y-1, z+1 */
-            nbrs.push_back( x_val + (y_val-1)*length + ((z_val+1)%length)*len2 );
-            
-            /* x, y-1, z-1 */
-            nbrs.push_back( x_val + (y_val-1)*length + ((z_val-1+length)%length)*len2 );
-
+            z_new = (z_val + 1) % length;
+            nbrs.push_back(x_new + y_new * length + z_new * length2);
         }
     }
 }
 
 
-/* PBC in no direction: 
- * We check whether the x-value is 0 or length-1. If it is then we don't
- * connect the neighbor to the left (for 0) or right (for length-1).   
- * We do the same for y and z.
- */
-void BCC::setNbrs0(size_t i) 
-{
-
-	/* populates the neighbor array */
-	size_t x_val = 0, y_val = 0, z_val = 0;
-    static size_t len2 = length*length;
-
-    /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( (i - x_val)/length ) % length;
-    z_val = (i - x_val - y_val*length) / len2;
-
-    nbrs.clear();
-
-    if( z_val != length + 1 )
-    {
-        /* x, y, z+1 */
-        nbrs.push_back( x_val + y_val*length + (z_val+1)*len2 );
-    }
-    
-    if( z_val != 0 )
-    {
-        /* x, y, z-1 */
-        nbrs.push_back( x_val + y_val*length + (z_val-1)*len2 );
-    }
-
-    if( z_val %2 )
-    {
-        if(y_val != length-1 && z_val != length -1)
-        {
-            /* x, y+1, z+1 */
-            nbrs.push_back( x_val + (y_val+1)*length + (z_val+1)*len2 );
-        }
-        
-        if(y_val != length-1 && z_val != 0)
-        {
-            /* x, y+1, z-1 */
-            nbrs.push_back( x_val + (y_val+1)*length + (z_val-1)*len2 );
-        }
-
-        if(x_val != length-1 && z_val != length - 1)
-        {
-            /* x+1, y, z+1 */
-            nbrs.push_back( x_val+1 + y_val*length + (z_val+1)*len2 );
-        }
-        
-        if(x_val != length-1 && z_val != 0)
-        {
-            /* x+1, y, z-1 */
-            nbrs.push_back( x_val+1 + y_val*length + (z_val-1)*len2 );
-        }
-        
-        if(x_val != length-1 && y_val != length-1 && z_val != length-1)
-        {
-            /* x+1, y+1, z+1 */
-            nbrs.push_back( x_val+1 + (y_val+1)*length + (z_val+1)*len2 );
-        }
-        
-        if(x_val != length-1 && y_val != length-1 && z_val != 0)
-        {
-            /* x+1, y+1, z-1 */
-            nbrs.push_back( x_val+1 + (y_val+1)*length + (z_val-1)*len2 );
-        }
-
-    }
-
-    else
-    {
-        if(x_val != 0 && y_val != 0 && z_val != length-1)
-        {
-            /* x-1, y-1, z+1 */
-            nbrs.push_back( x_val-1 + (y_val-1)*length + (z_val+1)*len2 );
-        }
-
-        if(x_val != 0 && y_val != 0 && z_val != 0)
-        {
-            /* x-1, y-1, z-1 */
-            nbrs.push_back( x_val-1 + (y_val-1)*length + (z_val-1)*len2 );
-        }
-        
-        if(x_val != 0 && z_val != length-1)
-        {
-            /* x-1, y, z+1 */
-            nbrs.push_back( x_val-1 + y_val*length + (z_val+1)*len2 );
-        }
-        
-        if(x_val != 0 && z_val != 0)
-        {
-            /* x-1, y, z-1 */
-            nbrs.push_back( x_val-1 + y_val*length + (z_val-1)*len2 );
-        }
-
-        if(y_val != 0 && z_val != length-1)
-        {
-            /* x, y-1, z+1 */
-            nbrs.push_back( x_val + (y_val-1)*length + (z_val+1)*len2 );
-        }
-        
-        if(y_val != 0 && z_val != 0)
-        {
-            /* x, y-1, z-1 */
-            nbrs.push_back( x_val + (y_val-1)*length + (z_val-1)*len2 );
-        }
-
-    }
-    
-}
+// Let the compiler know we want these
+template class BCC<0>;
+template class BCC<1>;
+template class BCC<2>;
+template class BCC<3>;

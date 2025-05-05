@@ -35,12 +35,8 @@ class LatticeRegular: public Lattice
          size_t num_neighbors;
          size_t last;
          std::vector <size_t> nbrs; /* holds the neighbor tags for a given site */
-         
-         // This function is specific to regular lattices
-         void (LatticeRegular::*setNbrs) (size_t); /* populates the nbrs array */
+         virtual void setNbrs(size_t) {};
 
 };
-
-typedef void ( LatticeRegular::*LRFptr ) (size_t );
 
 #endif

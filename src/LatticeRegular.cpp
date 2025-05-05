@@ -4,9 +4,9 @@
 
 size_t LatticeRegular::getNumNeighbors( size_t i) { 
     if( last != i ) {
-        (this->*setNbrs)( i );
+        setNbrs(i);
+        last = i;
     }
-    last = i;
     return nbrs.size();
 }
 
@@ -21,9 +21,9 @@ size_t LatticeRegular::getNumNeighbors( size_t i) {
 size_t LatticeRegular::getNbr(size_t i, size_t j) 
 {
     if( last != i ) {
-        (this->*setNbrs)( i );
+        setNbrs(i);
+        last = i;
     }
-    last = i;
 
     return nbrs[j];
 }
@@ -34,9 +34,9 @@ size_t LatticeRegular::getNumActiveNeighbors(size_t i)
     size_t count = 0;
 
 	if( last != i ) {
-        (this->*setNbrs)( i );
+        setNbrs(i);
+        last = i;
     }
-    last = i;
 
     for( size_t j = 0; j < getNumNeighbors(i); j++ ) {
         if( isActive( nbrs[j] ) ) {
@@ -46,4 +46,3 @@ size_t LatticeRegular::getNumActiveNeighbors(size_t i)
 
     return count;
 }
-

@@ -7,24 +7,15 @@
 
 #include "LatticeRegular4d.h"
 
+template<short pbc>
 class Cubic4d: public LatticeRegular4d
 {
     public:
-         Cubic4d(size_t len, size_t id = 0, short pbc = 4) 
-             : LatticeRegular4d( len, id ) 
-         {
-             Setup(pbc);
-         }
-         virtual ~Cubic4d() {}
+        Cubic4d(size_t len, size_t id=0) : LatticeRegular4d(len, id, 8)  {}
+        virtual ~Cubic4d() {}
+        virtual size_t getNumNeighbors(size_t i);
 
     protected:
-         short PBC;
-         void Setup(short pbc = 4);
-         void setNbrs0(size_t); /* no PBC */
-         void setNbrsZ(size_t); /* PBC in one direction */
-         void setNbrsYZ(size_t); /* PBC in two directions */
-         void setNbrsXYZ(size_t); /* PBC in three directions */
-         void setNbrsWXYZ(size_t); /* PBC in all directions */
-
+        virtual void setNbrs(size_t);
 };
 #endif

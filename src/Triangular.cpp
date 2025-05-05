@@ -1,35 +1,21 @@
 #include "Triangular.h"
-#include <vector>
-#include <cmath>
 
-void Triangular::Setup(short pbc)
-{
-    /* If num_sites was changed in the constructor, this makes sure that
-     * length is properly defined.
-     */
-    length = static_cast< size_t >( ceil(sqrt(num_sites)) );
-    num_neighbors = 6;
-    nbrs.resize(num_neighbors);
-    last = num_sites;
-    
-    /* Set the boundary conditions and set the correct setNbrs function */
-    PBC = pbc;
-    if( PBC >= 2 ) setNbrs = (LRFptr) &Triangular::setNbrsXY;
-    else if( PBC == 1) setNbrs = (LRFptr) &Triangular::setNbrsY;
-    else setNbrs = (LRFptr) &Triangular::setNbrs0;
+
+/* PBC in both directions. Every site is treated the same */
+
+template<>
+size_t Triangular<2>::getNumNeighbors(size_t) {
+    return 6; 
 }
 
-/* PBC in all directions. */
-void Triangular::setNbrsXY(size_t i) 
+
+template<>
+void Triangular<2>::setNbrs(size_t i) 
 {
 
-	/* populates the neighbor array */
-	size_t x_val, y_val;
-	x_val = y_val = 0;
-
     /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( i - x_val ) / length;
+    size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
 
     /* right, x + 1 */
     nbrs[0] = ( x_val + 1 ) % length + y_val * length;
@@ -56,15 +42,22 @@ void Triangular::setNbrsXY(size_t i)
  * connect the neighbor to the left (for 0) or right (for length-1)   
  * This results in PBC in the Y direction.
  */
-void Triangular::setNbrsY(size_t i) 
+
+template<>
+size_t Triangular<1>::getNumNeighbors(size_t i) {
+	size_t x_val = i % length;
+    size_t nn = 6;
+    if(x_val == 0 || x_val == length-1) nn -= 2;
+    return nn;
+}
+
+
+template<>
+void Triangular<1>::setNbrs(size_t i) 
 {
-
-	/* populates the neighbor array */
-	size_t x_val = 0, y_val = 0;
-
     /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( i - x_val ) / length;
+    size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
 
     nbrs.clear();
 
@@ -101,15 +94,32 @@ void Triangular::setNbrsY(size_t i)
  * connect the neighbor to the left (for 0) or right (for length-1)   
  * We must also check whether if the y-value is 0 or length-1, etc.
  */
-void Triangular::setNbrs0(size_t i) 
+
+template<>
+size_t Triangular<0>::getNumNeighbors(size_t i) {
+    size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
+
+    size_t nn = 6;
+    if(x_val == 0 || x_val == length-1) nn -= 2;
+    if(y_val == 0 || y_val == length-1) nn -= 2;
+    
+	// The upper-left and lower-right corners are convex, so +1 nbr
+    if( x_val == 0 && y_val == length-1) {
+        nn += 1;
+    }
+    if( x_val == length -1 && y_val == 0) {
+        nn += 1;
+    }
+    return nn;
+}
+
+template<>
+void Triangular<0>::setNbrs(size_t i) 
 {
-
-	/* populates the neighbor array */
-	size_t x_val = 0, y_val = 0;
-
     /* Get the coordinates of the lattice site */
-    x_val = i % length;
-    y_val = ( i - x_val ) / length;
+    size_t x_val = i % length;
+    size_t y_val = ( i - x_val ) / length;
 
     nbrs.clear();
 
@@ -143,3 +153,9 @@ void Triangular::setNbrs0(size_t i)
         nbrs.push_back( ( x_val + 1 ) + (( y_val - 1 + length )%length) * length);
     }
 }
+
+
+// Let the compiler know we want these
+template class Triangular<0>;
+template class Triangular<1>;
+template class Triangular<2>;

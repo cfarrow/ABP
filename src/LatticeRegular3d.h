@@ -12,16 +12,28 @@
 #ifndef LATTICEREGULAR3D_H
 #define LATTICEREGULAR3D_H
 
+#include <cmath>
 #include "LatticeRegular.h"
 
 class LatticeRegular3d: public LatticeRegular
 {
     public:
-         LatticeRegular3d(size_t len, size_t id = 0) : LatticeRegular( len*len*len, id ) {}
-         virtual ~LatticeRegular3d() {}
+        LatticeRegular3d(size_t len, size_t id=0, size_t nn=0) 
+        : LatticeRegular(len*len*len, id) {
+            length = static_cast<size_t>(ceil(pow(num_sites, 1.0/3.0)));
+            length2 = length * length;
+            num_neighbors = nn;
+            nbrs.resize(num_neighbors);
+            last = num_sites;
+        }
+        virtual ~LatticeRegular3d() {}
 
-         /* virtual functions */
-         virtual bool isSpanning(size_t = 1);
+        /* virtual functions */
+        virtual bool isSpanning(size_t = 1);
+
+    protected:
+        size_t length2; // Square of length, used a lot
 
 };
+
 #endif
