@@ -3,6 +3,7 @@
 */
 
 #include "BCC.h"
+#include "Point.h"
 
 /* 
 A BCC lattice comprises two intercalated cubic sub-lattices. We call them A and
@@ -57,29 +58,16 @@ size_t BCC<3>::getNumNeighbors(size_t) {
 template <>
 void BCC<3>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( (i - x_val)/length ) % length;
-    size_t z_val = (i - x_val - y_val*length) / length2;
-
-    bool is_A = z_val % 2 == 0;
+    Point3d p{i, length};
+    bool is_A = p.z % 2 == 0;
     int m = is_A ? -1 : 1;  // Multiply by -1 for A lattice
     short sx, sy;
-    size_t x_new, y_new, z_new;
-
     for(int j=0; j<4; j++)
     {
         sx = m * B_shifts[j][0];
         sy = m * B_shifts[j][1];
-
-        x_new = (x_val + sx + length) % length;
-        y_new = (y_val + sy + length) % length;
-
-        z_new = (z_val - 1 + length) % length;
-        nbrs[2*j] = x_new + y_new * length + z_new * length2;
-
-        z_new = (z_val + 1) % length;
-        nbrs[2*j + 1] = x_new + y_new * length + z_new * length2;
+        nbrs[2*j]     = p.shift(sx, sy,  1);
+        nbrs[2*j + 1] = p.shift(sx, sy, -1);
     }
 }
 
@@ -87,13 +75,10 @@ void BCC<3>::setNbrs(size_t i)
 
 template<>
 size_t BCC<2>::getNumNeighbors(size_t i) {
-    size_t x_val = i % length;
-    size_t y_val = ( (i - x_val)/length ) % length;
-    size_t z_val = (i - x_val - y_val*length) / length2;
-
-    bool is_A = z_val % 2 == 0;
-    bool botm_face = is_A && z_val == 0;
-    bool top_face = !is_A && z_val == length - 1;
+    Point3d p{i, length};
+    bool is_A = p.z % 2 == 0;
+    bool botm_face = is_A && p.z == 0;
+    bool top_face = !is_A && p.z == b;
 
     if(botm_face || top_face) return 4;
     return 8;
@@ -103,39 +88,21 @@ size_t BCC<2>::getNumNeighbors(size_t i) {
 template <>
 void BCC<2>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( (i - x_val)/length ) % length;
-    size_t z_val = (i - x_val - y_val*length) / length2;
-
-    bool is_A = z_val % 2 == 0;
+    Point3d p{i, length};
+    bool is_A = p.z % 2 == 0;
     int m = is_A ? -1 : 1;  // Multiply by -1 for A lattice
     short sx, sy;
-    size_t x_new, y_new, z_new;
     
-    bool botm_face = is_A && z_val == 0;
-    bool top_face = !is_A && z_val == length - 1;
+    bool botm_face = is_A && p.z == 0;
+    bool top_face = !is_A && p.z == b;
 
     nbrs.clear();
     for(int j=0; j<4; j++)
     {
         sx = m * B_shifts[j][0];
         sy = m * B_shifts[j][1];
-
-        x_new = (x_val + sx + length) % length;
-        y_new = (y_val + sy + length) % length;
-
-        if(!botm_face)
-        {
-            z_new = (z_val - 1 + length) % length;
-            nbrs.push_back(x_new + y_new * length + z_new * length2);
-        }
-
-        if(!top_face)
-        {
-            z_new = (z_val + 1) % length;
-            nbrs.push_back(x_new + y_new * length + z_new * length2);
-        }
+        if(!botm_face)  nbrs.push_back(p.shift(sx, sy, -1));
+        if(!top_face)   nbrs.push_back(p.shift(sx, sy,  1));
     }
 }
 
@@ -144,15 +111,12 @@ void BCC<2>::setNbrs(size_t i)
 
 template<>
 size_t BCC<1>::getNumNeighbors(size_t i) {
-    size_t x_val = i % length;
-    size_t y_val = ( (i - x_val)/length ) % length;
-    size_t z_val = (i - x_val - y_val*length) / length2;
-
-    bool is_A = z_val % 2 == 0;
-    bool botm_face = is_A && z_val == 0;
-    bool top_face = !is_A && z_val == length - 1;
-    bool front_face = is_A && y_val == 0;
-    bool back_face = !is_A && y_val == length - 1;
+    Point3d p{i, length};
+    bool is_A = p.z % 2 == 0;
+    bool botm_face = is_A && p.z == 0;
+    bool top_face = !is_A && p.z == b;
+    bool front_face = is_A && p.y == 0;
+    bool back_face = !is_A && p.y == b;
 
     int num_faces = botm_face + front_face + top_face + back_face;
 
@@ -173,20 +137,15 @@ size_t BCC<1>::getNumNeighbors(size_t i) {
 template<>
 void BCC<1>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( (i - x_val)/length ) % length;
-    size_t z_val = (i - x_val - y_val*length) / length2;
-
-    bool is_A = z_val % 2 == 0;
+    Point3d p{i, length};
+    bool is_A = p.z % 2 == 0;
     int m = is_A ? -1 : 1;  // Multiply by -1 for A lattice
     short sx, sy;
-    size_t x_new, y_new, z_new;
     
-    bool botm_face = is_A && z_val == 0;
-    bool top_face = !is_A && z_val == length - 1;
-    bool front_face = is_A && y_val == 0;
-    bool back_face = !is_A && y_val == length - 1;
+    bool botm_face = is_A && p.z == 0;
+    bool top_face = !is_A && p.z == b;
+    bool front_face = is_A && p.y == 0;
+    bool back_face = !is_A && p.y == b;
 
     nbrs.clear();
 
@@ -194,23 +153,13 @@ void BCC<1>::setNbrs(size_t i)
     {
         sx = m * B_shifts[j][0];
         sy = m * B_shifts[j][1];
-
-        x_new = (x_val + sx + length) % length;
-        y_new = (y_val + sy + length) % length;
-
         // Boundary conditions for A sublattice
         if(!botm_face && !(front_face && sy == -1))
-        {
-            z_new = (z_val - 1 + length) % length;
-            nbrs.push_back(x_new + y_new * length + z_new * length2);
-        }
+            nbrs.push_back(p.shift(sx, sy, -1));
 
         // Boundary conditions for B sublattice
         if(!top_face && !(back_face && sy == 1))
-        {
-            z_new = (z_val + 1) % length;
-            nbrs.push_back(x_new + y_new * length + z_new * length2);
-        }
+            nbrs.push_back(p.shift(sx, sy, 1));
     }
 }
 
@@ -219,17 +168,14 @@ void BCC<1>::setNbrs(size_t i)
 
 template<>
 size_t BCC<0>::getNumNeighbors(size_t i) {
-    size_t x_val = i % length;
-    size_t y_val = ( (i - x_val)/length ) % length;
-    size_t z_val = (i - x_val - y_val*length) / length2;
-
-    bool is_A = z_val % 2 == 0;
-    bool botm_face = is_A && z_val == 0;
-    bool top_face = !is_A && z_val == length - 1;
-    bool front_face = is_A && y_val == 0;
-    bool back_face = !is_A && y_val == length - 1;
-    bool left_face = is_A && x_val == 0;
-    bool right_face = !is_A && x_val == length - 1;
+    Point3d p{i, length};
+    bool is_A = p.z % 2 == 0;
+    bool botm_face = is_A && p.z == 0;
+    bool top_face = !is_A && p.z == b;
+    bool front_face = is_A && p.y == 0;
+    bool back_face = !is_A && p.y == b;
+    bool left_face = is_A && p.x == 0;
+    bool right_face = !is_A && p.x == b;
 
     // A point can only be on a single sub-lattice, so we can sum the conditions
     // to determine if a point is on a corner, edge, face, or body.
@@ -257,22 +203,17 @@ template<>
 void BCC<0>::setNbrs(size_t i) 
 {
 
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( (i - x_val)/length ) % length;
-    size_t z_val = (i - x_val - y_val*length) / length2;
-
-    bool is_A = z_val % 2 == 0;
+    Point3d p{i, length};
+    bool is_A = p.z % 2 == 0;
     int m = is_A ? -1 : 1;  // Multiply by -1 for A lattice
     short sx, sy;
-    size_t x_new, y_new, z_new;
     
-    bool botm_face = is_A && z_val == 0;
-    bool top_face = !is_A && z_val == length - 1;
-    bool front_face = is_A && y_val == 0;
-    bool back_face = !is_A && y_val == length - 1;
-    bool left_face = is_A && x_val == 0;
-    bool right_face = !is_A && x_val == length - 1;
+    bool botm_face = is_A && p.z == 0;
+    bool top_face = !is_A && p.z == b;
+    bool front_face = is_A && p.y == 0;
+    bool back_face = !is_A && p.y == b;
+    bool left_face = is_A && p.x == 0;
+    bool right_face = !is_A && p.x == b;
 
     nbrs.clear();
     for(int j=0; j<4; j++)
@@ -280,22 +221,13 @@ void BCC<0>::setNbrs(size_t i)
         sx = m * B_shifts[j][0];
         sy = m * B_shifts[j][1];
 
-        x_new = (x_val + sx + length) % length;
-        y_new = (y_val + sy + length) % length;
-
         // Boundary conditions for A sublattice
         if(!botm_face && !(front_face && sy == -1) && !(left_face && sx == -1))
-        {
-            z_new = (z_val - 1 + length) % length;
-            nbrs.push_back(x_new + y_new * length + z_new * length2);
-        }
+            nbrs.push_back(p.shift(sx, sy, -1));
 
         // Boundary conditions for B sublattice
         if(!top_face && !(back_face && sy == 1) && !(right_face && sx == 1))
-        {
-            z_new = (z_val + 1) % length;
-            nbrs.push_back(x_new + y_new * length + z_new * length2);
-        }
+            nbrs.push_back(p.shift(sx, sy, 1));
     }
 }
 

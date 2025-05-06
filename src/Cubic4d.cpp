@@ -1,4 +1,5 @@
 #include "Cubic4d.h"
+#include "Point.h"
 
 /* PBC in all directions */
 
@@ -11,35 +12,15 @@ size_t Cubic4d<4>::getNumNeighbors(size_t) {
 template<>
 void Cubic4d<4>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t w_val = i % length;
-    size_t x_val = ((i - w_val) % length2)/length;
-    size_t y_val = ((i - w_val - x_val*length) % length3) / length2;
-    size_t z_val = (i - w_val - x_val*length - y_val*length2) / length3;
-
-    /* w + 1 */
-    nbrs[0] = (w_val+1)%length + x_val*length + y_val*length2 + z_val*length3;
-
-    /* w - 1 */
-    nbrs[1] = (w_val-1+length)%length + x_val*length + y_val*length2 + z_val*length3;
-
-    /* x + 1 */
-    nbrs[2] = w_val + ((x_val+1)%length)*length + y_val*length2 + z_val*length3;
-
-    /* x - 1 */
-    nbrs[3] = w_val + ((x_val-1+length)%length)*length + y_val*length2 + z_val*length3;
-
-    /* y + 1 */
-    nbrs[4] = w_val + x_val*length + ((y_val+1)%length)*length2 + z_val*length3;
-
-    /* y - 1 */
-    nbrs[5] = w_val + x_val*length + ((y_val-1+length)%length)*length2 + z_val*length3;
-
-    /* z + 1 */
-    nbrs[6] = w_val + x_val*length + y_val*length2 + ((z_val+1)%length)*length3;
-
-    /* z - 1 */
-    nbrs[7] = w_val + x_val*length + y_val*length2 + ((z_val-1+length)%length)*length3;
+    Point4d p{i, length};
+    nbrs[0] = p.shift(-1,  0,  0,  0);
+    nbrs[1] = p.shift( 1,  0,  0,  0);
+    nbrs[2] = p.shift( 0, -1,  0,  0);
+    nbrs[3] = p.shift( 0,  1,  0,  0);
+    nbrs[4] = p.shift( 0,  0, -1,  0);
+    nbrs[5] = p.shift( 0,  0,  1,  0);
+    nbrs[6] = p.shift( 0,  0,  0, -1);
+    nbrs[7] = p.shift( 0,  0,  0,  1);
 }
 
 
@@ -49,10 +30,9 @@ void Cubic4d<4>::setNbrs(size_t i)
  */
 template<>
 size_t Cubic4d<3>::getNumNeighbors(size_t i) {
-    size_t w_val = i % length;
-
+    Point4d p{i, length};
     size_t nn = 8;
-    if(w_val == 0 || w_val == length-1) nn -= 1;
+    if(p.w == 0 || p.w == b) nn -= 1;
     return nn;
 }
 
@@ -60,39 +40,16 @@ size_t Cubic4d<3>::getNumNeighbors(size_t i) {
 template<>
 void Cubic4d<3>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t w_val = i % length;
-    size_t x_val = ((i - w_val) % length2)/length;
-    size_t y_val = ((i - w_val - x_val*length) % length3) / length2;
-    size_t z_val = (i - w_val - x_val*length - y_val*length2) / length3;
-
-    if( w_val != length - 1 ) {
-        /* w + 1 */
-        nbrs[0] = (w_val+1) + x_val*length + y_val*length2 + z_val*length3;
-    }
-
-    if( w_val != 0 ) {
-        /* w - 1 */
-        nbrs[1] = (w_val-1) + x_val*length + y_val*length2 + z_val*length3;
-    }
-
-    /* x + 1 */
-    nbrs[2] = w_val + ((x_val+1)%length)*length + y_val*length2 + z_val*length3;
-
-    /* x - 1 */
-    nbrs[3] = w_val + ((x_val-1+length)%length)*length + y_val*length2 + z_val*length3;
-
-    /* y + 1 */
-    nbrs[4] = w_val + x_val*length + ((y_val+1)%length)*length2 + z_val*length3;
-
-    /* y - 1 */
-    nbrs[5] = w_val + x_val*length + ((y_val-1+length)%length)*length2 + z_val*length3;
-
-    /* z + 1 */
-    nbrs[6] = w_val + x_val*length + y_val*length2 + ((z_val+1)%length)*length3;
-
-    /* z - 1 */
-    nbrs[7] = w_val + x_val*length + y_val*length2 + ((z_val-1+length)%length)*length3;
+    Point4d p{i, length};
+    nbrs.clear();
+    if(p.w != 0)    nbrs.push_back(p.shift(-1,  0,  0,  0));
+    if(p.w != b)    nbrs.push_back(p.shift( 1,  0,  0,  0));
+    nbrs.push_back(p.shift( 0, -1,  0,  0));
+    nbrs.push_back(p.shift( 0,  1,  0,  0));
+    nbrs.push_back(p.shift( 0,  0, -1,  0));
+    nbrs.push_back(p.shift( 0,  0,  1,  0));
+    nbrs.push_back(p.shift( 0,  0,  0, -1));
+    nbrs.push_back(p.shift( 0,  0,  0,  1));
 }
 
 
@@ -102,12 +59,10 @@ void Cubic4d<3>::setNbrs(size_t i)
  */
 template<>
 size_t Cubic4d<2>::getNumNeighbors(size_t i) {
-    size_t w_val = i % length;
-    size_t x_val = ((i - w_val) % length2)/length;
-    
+    Point4d p{i, length};
     size_t nn = 8;
-    if(w_val == 0 || w_val == length-1) nn -= 1;
-    if(x_val == 0 || x_val == length-1) nn -= 1;
+    if(p.w == 0 || p.w == b) nn -= 1;
+    if(p.x == 0 || p.x == b) nn -= 1;
     return nn;
 }
 
@@ -115,43 +70,16 @@ size_t Cubic4d<2>::getNumNeighbors(size_t i) {
 template<>
 void Cubic4d<2>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t w_val = i % length;
-    size_t x_val = ((i - w_val) % length2)/length;
-    size_t y_val = ((i - w_val - x_val*length) % length3) / length2;
-    size_t z_val = (i - w_val - x_val*length - y_val*length2) / length3;
-
-    if( w_val != length - 1 ) {
-        /* w + 1 */
-        nbrs[0] = (w_val+1) + x_val*length + y_val*length2 + z_val*length3;
-    }
-
-    if( w_val != 0 ) {
-        /* w - 1 */
-        nbrs[1] = (w_val-1) + x_val*length + y_val*length2 + z_val*length3;
-    }
-
-    if( x_val != length - 1 ) {
-        /* x + 1 */
-        nbrs[2] = w_val + (x_val+1)*length + y_val*length2 + z_val*length3;
-    }
-
-    if( x_val != 0 ) {
-        /* x - 1 */
-        nbrs[3] = w_val + (x_val-1)*length + y_val*length2 + z_val*length3;
-    }
-
-    /* y + 1 */
-    nbrs[4] = w_val + x_val*length + ((y_val+1)%length)*length2 + z_val*length3;
-
-    /* y - 1 */
-    nbrs[5] = w_val + x_val*length + ((y_val-1+length)%length)*length2 + z_val*length3;
-
-    /* z + 1 */
-    nbrs[6] = w_val + x_val*length + y_val*length2 + ((z_val+1)%length)*length3;
-
-    /* z - 1 */
-    nbrs[7] = w_val + x_val*length + y_val*length2 + ((z_val-1+length)%length)*length3;
+    Point4d p{i, length};
+    nbrs.clear();
+    if(p.w != 0)    nbrs.push_back(p.shift(-1,  0,  0,  0));
+    if(p.w != b)    nbrs.push_back(p.shift( 1,  0,  0,  0));
+    if(p.x != 0)    nbrs.push_back(p.shift( 0, -1,  0,  0));
+    if(p.x != b)    nbrs.push_back(p.shift( 0,  1,  0,  0));
+    nbrs.push_back(p.shift( 0,  0, -1,  0));
+    nbrs.push_back(p.shift( 0,  0,  1,  0));
+    nbrs.push_back(p.shift( 0,  0,  0, -1));
+    nbrs.push_back(p.shift( 0,  0,  0,  1));
 }
 
 /* PBC in one directions: 
@@ -160,61 +88,27 @@ void Cubic4d<2>::setNbrs(size_t i)
  */
 template<>
 size_t Cubic4d<1>::getNumNeighbors(size_t i) {
-    size_t w_val = i % length;
-    size_t x_val = ((i - w_val) % length2)/length;
-    size_t y_val = ((i - w_val - x_val*length) % length3) / length2;
-    
+    Point4d p{i, length};
     size_t nn = 8;
-    if(w_val == 0 || w_val == length-1) nn -= 1;
-    if(x_val == 0 || x_val == length-1) nn -= 1;
-    if(y_val == 0 || y_val == length-1) nn -= 1;
+    if(p.w == 0 || p.w == b) nn -= 1;
+    if(p.x == 0 || p.x == b) nn -= 1;
+    if(p.y == 0 || p.y == b) nn -= 1;
     return nn;
 }
 
 template<>
 void Cubic4d<1>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t w_val = i % length;
-    size_t x_val = ((i - w_val) % length2)/length;
-    size_t y_val = ((i - w_val - x_val*length) % length3) / length2;
-    size_t z_val = (i - w_val - x_val*length - y_val*length2) / length3;
-
-    if( w_val != length - 1 ) {
-        /* w + 1 */
-        nbrs[0] = (w_val+1) + x_val*length + y_val*length2 + z_val*length3;
-    }
-
-    if( w_val != 0 ) {
-        /* w - 1 */
-        nbrs[1] = (w_val-1) + x_val*length + y_val*length2 + z_val*length3;
-    }
-
-    if( x_val != length - 1 ) {
-        /* x + 1 */
-        nbrs[2] = w_val + (x_val+1)*length + y_val*length2 + z_val*length3;
-    }
-
-    if( x_val != 0 ) {
-        /* x - 1 */
-        nbrs[3] = w_val + (x_val-1)*length + y_val*length2 + z_val*length3;
-    }
-
-    if( y_val != length - 1) {
-        /* y + 1 */
-        nbrs[4] = w_val + x_val*length + (y_val+1)*length2 + z_val*length3;
-    }
-
-    if( y_val != 0) {
-        /* y - 1 */
-        nbrs[5] = w_val + x_val*length + (y_val-1)*length2 + z_val*length3;
-    }
-
-    /* z + 1 */
-    nbrs[6] = w_val + x_val*length + y_val*length2 + ((z_val+1)%length)*length3;
-
-    /* z - 1 */
-    nbrs[7] = w_val + x_val*length + y_val*length2 + ((z_val-1+length)%length)*length3;
+    Point4d p{i, length};
+    nbrs.clear();
+    if(p.w != 0)    nbrs.push_back(p.shift(-1,  0,  0,  0));
+    if(p.w != b)    nbrs.push_back(p.shift( 1,  0,  0,  0));
+    if(p.x != 0)    nbrs.push_back(p.shift( 0, -1,  0,  0));
+    if(p.x != b)    nbrs.push_back(p.shift( 0,  1,  0,  0));
+    if(p.y != 0)    nbrs.push_back(p.shift( 0,  0, -1,  0));
+    if(p.y != b)    nbrs.push_back(p.shift( 0,  0,  1,  0));
+    nbrs.push_back(p.shift( 0,  0,  0, -1));
+    nbrs.push_back(p.shift( 0,  0,  0,  1));
 }
 
 
@@ -224,16 +118,12 @@ void Cubic4d<1>::setNbrs(size_t i)
  */
 template<>
 size_t Cubic4d<0>::getNumNeighbors(size_t i) {
-    size_t w_val = i % length;
-    size_t x_val = ((i - w_val) % length2)/length;
-    size_t y_val = ((i - w_val - x_val*length) % length3) / length2;
-    size_t z_val = (i - w_val - x_val*length - y_val*length2) / length3;
-    
+    Point4d p{i, length};
     size_t nn = 8;
-    if(w_val == 0 || w_val == length-1) nn -= 1;
-    if(x_val == 0 || x_val == length-1) nn -= 1;
-    if(y_val == 0 || y_val == length-1) nn -= 1;
-    if(z_val == 0 || z_val == length-1) nn -= 1;
+    if(p.w == 0 || p.w == b) nn -= 1;
+    if(p.x == 0 || p.x == b) nn -= 1;
+    if(p.y == 0 || p.y == b) nn -= 1;
+    if(p.z == 0 || p.z == b) nn -= 1;
     return nn;
 }
 
@@ -241,51 +131,16 @@ size_t Cubic4d<0>::getNumNeighbors(size_t i) {
 template<>
 void Cubic4d<0>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t w_val = i % length;
-    size_t x_val = ((i - w_val) % length2)/length;
-    size_t y_val = ((i - w_val - x_val*length) % length3) / length2;
-    size_t z_val = (i - w_val - x_val*length - y_val*length2) / length3;
-
-    if( w_val != length - 1 ) {
-        /* w + 1 */
-        nbrs[0] = (w_val+1) + x_val*length + y_val*length2 + z_val*length3;
-    }
-
-    if( w_val != 0 ) {
-        /* w - 1 */
-        nbrs[1] = (w_val-1) + x_val*length + y_val*length2 + z_val*length3;
-    }
-
-    if( x_val != length - 1 ) {
-        /* x + 1 */
-        nbrs[2] = w_val + (x_val+1)*length + y_val*length2 + z_val*length3;
-    }
-
-    if( x_val != 0 ) {
-        /* x - 1 */
-        nbrs[3] = w_val + (x_val-1)*length + y_val*length2 + z_val*length3;
-    }
-
-    if( y_val != length - 1) {
-        /* y + 1 */
-        nbrs[4] = w_val + x_val*length + (y_val+1)*length2 + z_val*length3;
-    }
-
-    if( y_val != 0) {
-        /* y - 1 */
-        nbrs[5] = w_val + x_val*length + (y_val-1)*length2 + z_val*length3;
-    }
-
-    if( z_val != length - 1) {
-        /* z + 1 */
-        nbrs[6] = w_val + x_val*length + y_val*length2 + (z_val+1)*length3;
-    }
-
-    if( z_val != 0) {
-        /* z - 1 */
-        nbrs[7] = w_val + x_val*length + y_val*length2 + (z_val-1)*length3;
-    }
+    Point4d p{i, length};
+    nbrs.clear();
+    if(p.w != 0)    nbrs.push_back(p.shift(-1,  0,  0,  0));
+    if(p.w != b)    nbrs.push_back(p.shift( 1,  0,  0,  0));
+    if(p.x != 0)    nbrs.push_back(p.shift( 0, -1,  0,  0));
+    if(p.x != b)    nbrs.push_back(p.shift( 0,  1,  0,  0));
+    if(p.y != 0)    nbrs.push_back(p.shift( 0,  0, -1,  0));
+    if(p.y != b)    nbrs.push_back(p.shift( 0,  0,  1,  0));
+    if(p.z != 0)    nbrs.push_back(p.shift( 0,  0,  0, -1));
+    if(p.z != b)    nbrs.push_back(p.shift( 0,  0,  0,  1));
 }
 
 

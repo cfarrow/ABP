@@ -25,7 +25,7 @@ RANDOBJS = CubRand.o FixedZ.o SquRand.o SWNetwork.o TriRand.o
 	$(CXX) $(CXXFLAGS) $^ -o $*.out
 
 # library rules
-$(OBJS): MersenneTwister.h Lattice.h Lattice.cpp
+$(OBJS): MersenneTwister.h Point.h Lattice.h Lattice.cpp
 $(D2OBJS): LatticeRegular.h LatticeRegular.cpp LatticeRegular2d.h LatticeRegular2d.cpp
 $(D3OBJS): LatticeRegular.h LatticeRegular.cpp LatticeRegular3d.h LatticeRegular3d.cpp
 $(D4OBJS): LatticeRegular.h LatticeRegular.cpp LatticeRegular4d.h LatticeRegular4d.cpp

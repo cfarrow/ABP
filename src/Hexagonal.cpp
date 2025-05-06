@@ -3,8 +3,7 @@
 */
 
 #include "Hexagonal.h"
-#include <vector>
-#include <cmath>
+#include "Point.h"
 
 
 /* PBC in both direction
@@ -26,36 +25,23 @@ template<>
 void Hexagonal<2>::setNbrs(size_t i) 
 {
     /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
-
-    /* up, y + 1 */
-    nbrs[0] = x_val + (( y_val + 1 )%length) * length;
-
-    /* down, y - 1 */
-    nbrs[1] = x_val + (( y_val - 1 + length )%length) * length;
-
-    /* left/right, x+/- 1 */
-    nbrs[2] = (length + x_val + ((x_val+y_val)%2 ? 1 : -1))%length + y_val * length;
+    Point2d p{i, length};
+    bool left = (p.x + p.y) % 2;
+    nbrs[0] = p.shift(0, -1);
+    nbrs[1] = p.shift(0,  1);
+    nbrs[2] = p.shift(left ? -1 : 1, 0);
 }
 
 
-/* PBC in the Y-direction direction: */
+/* PBC in the Y direction */
 
 template<>
 size_t Hexagonal<1>::getNumNeighbors(size_t i) {
-	size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
+    Point2d p{i, length};
+    bool left = (p.x + p.y) % 2;
     size_t nn = 3;
-
-    /* The upper and lower neighbors remain.
-     * if x_val + y_val is even, the site is connected to the right
-     * if it is odd, the site is connected to the left
-     * the left boundary is even and the right boundary is odd
-     * Thus, points on those boundaries are missing a neighbor if they are in an
-     * odd row (y value).
-    */
-    if(y_val %2 == 1 && (x_val == 0 || x_val == length - 1)) nn -= 1;
+    if( left && p.x == 0)   nn -= 1;
+    if(!left && p.x == b)   nn -= 1;
     return nn;
 }
 
@@ -63,27 +49,14 @@ size_t Hexagonal<1>::getNumNeighbors(size_t i) {
 template<>
 void Hexagonal<1>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
+    Point2d p{i, length};
+    bool left = (p.x + p.y) % 2;
 
     nbrs.clear();
-
-    /* up, y + 1 */
-    nbrs.push_back( x_val + (( y_val + 1 )%length) * length );
-
-    /* down, y - 1 */
-    nbrs.push_back( x_val + (( y_val - 1 + length )%length) * length );
-
-    /* left, x - 1 */
-    if(!((x_val+y_val)%2) and x_val != 0) {
-    nbrs.push_back(  x_val - 1 + y_val * length );
-    }
-
-    /* right, x + 1 */
-    if((x_val+y_val)%2 and x_val != length-1) {
-    nbrs.push_back( x_val + 1 + y_val * length );
-    }
+    nbrs.push_back(p.shift( 0, -1));
+    nbrs.push_back(p.shift( 0,  1));
+    if( left && p.x != 0)   nbrs.push_back(p.shift(-1, 0));
+    if(!left && p.x != b)   nbrs.push_back(p.shift( 1, 0));
 }
 
 
@@ -91,19 +64,12 @@ void Hexagonal<1>::setNbrs(size_t i)
 
 template<>
 size_t Hexagonal<0>::getNumNeighbors(size_t i) {
-	size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
+    Point2d p{i, length};
+    bool left = (p.x + p.y) % 2;
     size_t nn = 3;
-
-    /* if x_val + y_val is even, the site is connected to the right
-     * if it is odd, the site is connected to the left
-     * the left boundary is even and the right boundary is odd
-     * Thus, points on those boundaries are missing a neighbor if they are in an
-     * odd row (y value).
-     * Points on the top and bottom boundaries are missing a neighbor.
-    */
-    if(y_val %2 == 1 && (x_val == 0 || x_val == length - 1)) nn -= 1;
-    if(y_val == 0 || y_val == length - 1) nn -= 1;
+    if( left && p.x == 0)       nn -= 1;
+    if(!left && p.x == b)       nn -= 1;
+    if(p.y == 0 || p.y == b)    nn -= 1;
     return nn;
 }
 
@@ -111,31 +77,14 @@ size_t Hexagonal<0>::getNumNeighbors(size_t i) {
 template<>
 void Hexagonal<0>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
+    Point2d p{i, length};
+    bool left = (p.x + p.y) % 2;
 
     nbrs.clear();
-
-    /* up, y + 1 */
-    if(y_val != length-1) {
-        nbrs.push_back( x_val + ( y_val + 1 ) * length );
-    }
-
-    /* down, y - 1 */
-    if(y_val != 0) {
-        nbrs.push_back( x_val + ( y_val - 1) * length );
-    }
-
-    /* left, x - 1 */
-    if(!((x_val+y_val)%2) and x_val != 0) {
-    nbrs.push_back( x_val - 1 + y_val * length );
-    }
-
-    /* left, x + 1 */
-    if((x_val+y_val)%2 and x_val != length-1) {
-    nbrs.push_back( x_val + 1 + y_val * length );
-    }
+    if(p.y != 0)            nbrs.push_back(p.shift( 0, -1));
+    if(p.y != b)            nbrs.push_back(p.shift( 0,  1));
+    if( left && p.x != 0)   nbrs.push_back(p.shift(-1,  0));
+    if(!left && p.x != b)   nbrs.push_back(p.shift( 1,  0));
 }
 
 

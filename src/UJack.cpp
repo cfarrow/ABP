@@ -1,12 +1,7 @@
 #include "UJack.h"
+#include "Point.h"
 
 
-/* For regular graphs, the convention is to create an array of neighbors
- * of site i with this function. It then is called whenever a neighbor
- * is needed. This saves space since a bond array is not required. This
- * will not work with random graphs, however.
- * THIS IS NOT DEFINED IN LATTICE_H SINCE IT IS SPECIFIC TO REGULAR GRAPHS.
- */
 template<>
 size_t UJack<2>::getNumNeighbors(size_t) {
     return 8; 
@@ -16,33 +11,15 @@ size_t UJack<2>::getNumNeighbors(size_t) {
 template<>
 void UJack<2>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
-
-    /* right, x + 1 */
-    nbrs[0] = ( x_val + 1 ) % length + y_val * length;
-    
-    /* up, y + 1 */
-    nbrs[1] = x_val + (( y_val + 1 )%length) * length;
-
-    /* left, x - 1 */
-    nbrs[2] = ( x_val - 1 + length )%length + y_val * length;
-    
-    /* down, y - 1 */
-    nbrs[3] = x_val + (( y_val - 1 + length )%length) * length;
-
-	/* up and left, x-1 & y+1 */
-	nbrs[4] = ( x_val - 1 + length )%length + (( y_val + 1 )%length) * length;
-
-	/* down and right, x+1 & y-1 */
-	nbrs[5] = ( x_val + 1 )%length + (( y_val - 1 + length )%length) * length;
-		
-    /* up and right, x+1 & y+1 */
-    nbrs[6] = ( x_val + 1 )%length + (( y_val + 1 )%length) * length;
-
-    /* down and left, x-1 & y-1 */
-    nbrs[7] = ( x_val - 1 - length )%length + (( y_val - 1 + length )%length) * length;
+    Point2d p{i, length};
+    nbrs[0] = p.shift(-1,  0);
+    nbrs[1] = p.shift( 1,  0);
+    nbrs[2] = p.shift( 0, -1);
+    nbrs[3] = p.shift( 0,  1);
+    nbrs[4] = p.shift(-1,  1);
+    nbrs[5] = p.shift( 1, -1);
+    nbrs[6] = p.shift( 1,  1);
+    nbrs[7] = p.shift(-1, -1);
 }
 
 
@@ -51,9 +28,9 @@ void UJack<2>::setNbrs(size_t i)
  * connect the neighbor to the left (for 0) or right (for length-1)   */
 template<>
 size_t UJack<1>::getNumNeighbors(size_t i) {
-	size_t x_val = i % length;
+    Point2d p{i, length};
     size_t nn = 8;
-    if(x_val == 0 || x_val == length-1) nn -= 3;
+    if(p.x == 0 || p.x == b) nn -= 3;
     return nn;
 }
 
@@ -61,47 +38,21 @@ size_t UJack<1>::getNumNeighbors(size_t i) {
 template<>
 void UJack<1>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
+    Point2d p{i, length};
 
     nbrs.clear();
-
-    /* right, x + 1 */
-    if( x_val != length -1 ) {
-        nbrs.push_back( ( x_val + 1 ) + y_val * length );
+    if(p.x != 0){
+        nbrs.push_back(p.shift(-1,  0));
+        nbrs.push_back(p.shift(-1,  1));
+        nbrs.push_back(p.shift(-1, -1));
     }
-    
-    /* up, y + 1 */
-    nbrs.push_back( x_val + (( y_val + 1 )%length) * length );
-
-    /* left, x - 1 */
-    if( x_val != 0 ) {
-        nbrs.push_back( ( x_val - 1 ) + y_val * length);
+    if(p.x != b){
+        nbrs.push_back(p.shift( 1,  0));
+        nbrs.push_back(p.shift( 1, -1));
+        nbrs.push_back(p.shift( 1,  1));
     }
-    
-    /* down, y - 1 */
-    nbrs.push_back( x_val + (( y_val - 1 + length )%length) * length);
-
-	/* up and left, x-1 & y+1 */
-    if( x_val != 0 ) {
-        nbrs.push_back( ( x_val - 1 ) + (( y_val + 1 )%length) * length);
-    }
-
-	/* down and right, x+1 & y-1 */
-    if( x_val != length -1 ) {
-        nbrs.push_back( ( x_val + 1 ) + (( y_val - 1 + length )%length) * length);
-    }
-
-    /* up and right, x+1 & y+1 */
-    if( x_val != length -1 ) {
-        nbrs.push_back( ( x_val + 1 ) + (( y_val + 1 )%length) * length );
-    }
-
-    /* down and left, x-1 & y-1 */
-    if( x_val != 0 ) {
-        nbrs.push_back( ( x_val - 1 ) + (( y_val - 1 + length )%length) * length );
-    }
+    nbrs.push_back(p.shift( 0, -1));
+    nbrs.push_back(p.shift( 0,  1));
 }
 
 
@@ -114,13 +65,10 @@ void UJack<1>::setNbrs(size_t i)
  * */
 template<>
 size_t UJack<0>::getNumNeighbors(size_t i) {
-	size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
+    Point2d p{i, length};
     size_t nn = 8;
-
-    bool x_boundary = (x_val == 0 || x_val == length-1);
-    bool y_boundary = (y_val == 0 || y_val == length-1);
-
+    bool x_boundary = (p.x == 0 || p.x == b);
+    bool y_boundary = (p.y == 0 || p.y == b);
     if(x_boundary) nn -= 3;
     if(y_boundary) nn -= 3;
     // If we're in a corner, then we counted a diagonal neighbor twice
@@ -132,51 +80,16 @@ size_t UJack<0>::getNumNeighbors(size_t i) {
 template<>
 void UJack<0>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
-
+    Point2d p{i, length};
     nbrs.clear();
-
-    /* right, x + 1 */
-    if( x_val != length -1 ) {
-        nbrs.push_back( ( x_val + 1 ) + y_val * length );
-    }
-    
-    /* up, y + 1 */
-    if( y_val != length -1 ) {
-        nbrs.push_back( x_val + ( y_val + 1 ) * length );
-    }
-
-    /* left, x - 1 */
-    if( x_val != 0 ) {
-        nbrs.push_back( ( x_val - 1 ) + y_val * length);
-    }
-    
-    /* down, y - 1 */
-    if( y_val != 0 ) {
-        nbrs.push_back( x_val + ( y_val - 1 ) * length);
-    }
-
-	/* up and left, x-1 & y+1 */
-    if( x_val != 0 && y_val != length-1) {
-        nbrs.push_back( ( x_val - 1 ) + (( y_val + 1 )%length) * length);
-    }
-
-	/* down and right, x+1 & y-1 */
-    if( x_val != length -1 && y_val != 0) {
-        nbrs.push_back( ( x_val + 1 ) + (( y_val - 1 + length )%length) * length);
-    }
-
-    /* up and right, x+1 & y+1 */
-    if( x_val != length -1  && y_val != length -1) {
-        nbrs.push_back( ( x_val + 1 ) + ( y_val + 1 ) * length );
-    }
-
-    /* down and left, x-1 & y-1 */
-    if( x_val != 0  && y_val != 0 ) {
-        nbrs.push_back( ( x_val - 1 ) + ( y_val - 1 ) * length );
-    }
+    if(p.x != 0)                nbrs.push_back(p.shift(-1,  0));
+    if(p.x != b)                nbrs.push_back(p.shift( 1,  0));
+    if(p.y != 0)                nbrs.push_back(p.shift( 0, -1));
+    if(p.y != b)                nbrs.push_back(p.shift( 0,  1));
+    if(p.x != 0 && p.y != b)    nbrs.push_back(p.shift(-1,  1));
+    if(p.x != b && p.x != 0)    nbrs.push_back(p.shift( 1, -1));
+    if(p.x != b && p.y != b)    nbrs.push_back(p.shift( 1,  1));
+    if(p.x != 0 && p.y != 0)    nbrs.push_back(p.shift(-1, -1));
 }
 
 

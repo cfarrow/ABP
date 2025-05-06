@@ -23,6 +23,7 @@ class LatticeRegular2d: public LatticeRegular
         LatticeRegular2d(size_t len, size_t id = 0, size_t nn = 0)
         : LatticeRegular(len*len, id) {
            length = static_cast< size_t >(ceil(sqrt(num_sites)));
+           b = length - 1;
            num_neighbors = nn;
            nbrs.resize(num_neighbors);
            last = num_sites;
@@ -32,6 +33,9 @@ class LatticeRegular2d: public LatticeRegular
 
         /* virtual functions */
         virtual bool isSpanning(size_t = 1);
+
+    protected:
+        size_t b; // The boundary of any dimension of the lattice
 
 };
 

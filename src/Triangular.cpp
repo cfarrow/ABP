@@ -1,4 +1,5 @@
 #include "Triangular.h"
+#include "Point.h"
 
 
 /* PBC in both directions. Every site is treated the same */
@@ -12,28 +13,13 @@ size_t Triangular<2>::getNumNeighbors(size_t) {
 template<>
 void Triangular<2>::setNbrs(size_t i) 
 {
-
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
-
-    /* right, x + 1 */
-    nbrs[0] = ( x_val + 1 ) % length + y_val * length;
-    
-    /* up, y + 1 */
-    nbrs[1] = x_val + (( y_val + 1 )%length) * length;
-
-    /* left, x - 1 */
-    nbrs[2] = ( x_val - 1 + length )%length + y_val * length;
-    
-    /* down, y - 1 */
-    nbrs[3] = x_val + (( y_val - 1 + length )%length) * length;
-
-	/* up and left, x-1 & y+1 */
-	nbrs[4] = ( x_val - 1 + length )%length + (( y_val + 1 )%length) * length;
-
-	/* down and right, x+1 & y-1 */
-	nbrs[5] = ( x_val + 1 )%length + (( y_val - 1 + length )%length) * length;
+    Point2d p{i, length};
+    nbrs[0] = p.shift( 1,  0);
+    nbrs[1] = p.shift( 0,  1);
+    nbrs[2] = p.shift(-1,  0);
+    nbrs[3] = p.shift( 0, -1);
+    nbrs[4] = p.shift(-1,  1);
+    nbrs[5] = p.shift( 1, -1);
 }
 
 
@@ -45,9 +31,9 @@ void Triangular<2>::setNbrs(size_t i)
 
 template<>
 size_t Triangular<1>::getNumNeighbors(size_t i) {
-	size_t x_val = i % length;
+    Point2d p{i, length};
     size_t nn = 6;
-    if(x_val == 0 || x_val == length-1) nn -= 2;
+    if(p.x == 0 || p.x == b) nn -= 2;
     return nn;
 }
 
@@ -55,36 +41,17 @@ size_t Triangular<1>::getNumNeighbors(size_t i) {
 template<>
 void Triangular<1>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
-
+    Point2d p{i, length};
     nbrs.clear();
-
-    /* right, x + 1 */
-    if( x_val != length -1 ) {
-        nbrs.push_back( ( x_val + 1 ) + y_val * length );
+    nbrs.push_back(p.shift( 0,  1));
+    nbrs.push_back(p.shift( 0, -1));
+    if(p.x != 0) {
+        nbrs.push_back(p.shift(-1,  0));
+        nbrs.push_back(p.shift(-1,  1));
     }
-    
-    /* up, y + 1 */
-    nbrs.push_back( x_val + (( y_val + 1 )%length) * length );
-
-    /* left, x - 1 */
-    if( x_val != 0 ) {
-        nbrs.push_back( ( x_val - 1 ) + y_val * length);
-    }
-    
-    /* down, y - 1 */
-    nbrs.push_back( x_val + (( y_val - 1 + length )%length) * length);
-
-	/* up and left, x-1 & y+1 */
-    if( x_val != 0 ) {
-        nbrs.push_back( ( x_val - 1 ) + (( y_val + 1 )%length) * length);
-    }
-
-	/* down and right, x+1 & y-1 */
-    if( x_val != length -1 ) {
-        nbrs.push_back( ( x_val + 1 ) + (( y_val - 1 + length )%length) * length);
+    if(p.x != b) {
+        nbrs.push_back(p.shift( 1,  0));
+        nbrs.push_back(p.shift( 1, -1));
     }
 }
 
@@ -97,61 +64,34 @@ void Triangular<1>::setNbrs(size_t i)
 
 template<>
 size_t Triangular<0>::getNumNeighbors(size_t i) {
-    size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
-
+    Point2d p{i, length};
     size_t nn = 6;
-    if(x_val == 0 || x_val == length-1) nn -= 2;
-    if(y_val == 0 || y_val == length-1) nn -= 2;
+    if(p.x == 0 || p.x == b) nn -= 2;
+    if(p.y == 0 || p.y == b) nn -= 2;
     
 	// The upper-left and lower-right corners are convex, so +1 nbr
-    if( x_val == 0 && y_val == length-1) {
-        nn += 1;
-    }
-    if( x_val == length -1 && y_val == 0) {
-        nn += 1;
-    }
+    if(p.x == 0 && p.y == b) nn += 1;
+    if(p.x == b && p.y == 0) nn += 1;
     return nn;
 }
+
 
 template<>
 void Triangular<0>::setNbrs(size_t i) 
 {
-    /* Get the coordinates of the lattice site */
-    size_t x_val = i % length;
-    size_t y_val = ( i - x_val ) / length;
+    Point2d p{i, length};
+    bool left = p.x == 0;
+    bool right = p.x == b;
+    bool botm = p.y == 0;
+    bool top = p.y == b;
 
     nbrs.clear();
-
-    /* right, x + 1 */
-    if( x_val != length -1 ) {
-        nbrs.push_back( ( x_val + 1 ) + y_val * length );
-    }
-    
-    /* up, y + 1 */
-    if( y_val != length -1 ) {
-        nbrs.push_back( x_val + ( y_val + 1 ) * length );
-    }
-
-    /* left, x - 1 */
-    if( x_val != 0 ) {
-        nbrs.push_back( ( x_val - 1 ) + y_val * length);
-    }
-    
-    /* down, y - 1 */
-    if( y_val != 0 ) {
-        nbrs.push_back( x_val + ( y_val - 1 ) * length);
-    }
-
-	/* up and left, x-1 & y+1 */
-    if( x_val != 0 && y_val != length-1) {
-        nbrs.push_back( ( x_val - 1 ) + (( y_val + 1 )%length) * length);
-    }
-
-	/* down and right, x+1 & y-1 */
-    if( x_val != length -1 && y_val != 0) {
-        nbrs.push_back( ( x_val + 1 ) + (( y_val - 1 + length )%length) * length);
-    }
+    if(!left)               nbrs.push_back(p.shift(-1,  0));
+    if(!right)              nbrs.push_back(p.shift( 1,  0));
+    if(!botm)               nbrs.push_back(p.shift( 0, -1));
+    if(!top)                nbrs.push_back(p.shift( 0,  1));
+    if(!left && !top)       nbrs.push_back(p.shift(-1,  1));
+    if(!right && !botm)     nbrs.push_back(p.shift( 1, -1));
 }
 
 
