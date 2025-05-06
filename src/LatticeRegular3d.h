@@ -22,7 +22,6 @@ class LatticeRegular3d: public LatticeRegular
         : LatticeRegular(len*len*len, id) {
             length = static_cast<size_t>(ceil(pow(num_sites, 1.0/3.0)));
             b = length - 1;
-            length2 = length * length;
             num_neighbors = nn;
             nbrs.resize(num_neighbors);
             last = num_sites;
@@ -33,7 +32,6 @@ class LatticeRegular3d: public LatticeRegular
         virtual bool isSpanning(size_t = 1);
 
     protected:
-        size_t length2; // Square of length, used a lot
         size_t b; // The boundary of any dimension of the lattice
 
 };

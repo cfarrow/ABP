@@ -16,8 +16,6 @@ class LatticeRegular4d: public LatticeRegular
         : LatticeRegular(len*len*len*len, id) {
             length = static_cast<size_t>(ceil(pow(num_sites, 0.25)));
             b = length - 1;
-            length2 = length * length;
-            length3 = length * length2;
             num_neighbors = nn;
             nbrs.resize(num_neighbors);
             last = num_sites;
@@ -28,9 +26,6 @@ class LatticeRegular4d: public LatticeRegular
         virtual bool isSpanning(size_t = 1);
 
     protected:
-        // Square and cube of length
-        size_t length2;
-        size_t length3;
         size_t b; // The boundary of any dimension of the lattice
 };
 #endif
