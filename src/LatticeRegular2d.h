@@ -20,14 +20,10 @@
 class LatticeRegular2d: public LatticeRegular
 {
     public:
-        LatticeRegular2d(size_t len, size_t id = 0, size_t nn = 0)
-        : LatticeRegular(len*len, id) {
+        LatticeRegular2d(size_t len, size_t id=0, size_t nn=0)
+        : LatticeRegular(len*len, id, nn) {
            length = static_cast< size_t >(ceil(sqrt(num_sites)));
            b = length - 1;
-           num_neighbors = nn;
-           nbrs.resize(num_neighbors);
-           last = num_sites;
-
         }
         virtual ~LatticeRegular2d() {}
 

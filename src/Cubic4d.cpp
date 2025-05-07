@@ -41,15 +41,15 @@ template<>
 void Cubic4d<3>::setNbrs(size_t i) 
 {
     Point4d p{i, length};
-    nbrs.clear();
-    if(p.w != 0)    nbrs.push_back(p.shift(-1,  0,  0,  0));
-    if(p.w != b)    nbrs.push_back(p.shift( 1,  0,  0,  0));
-    nbrs.push_back(p.shift( 0, -1,  0,  0));
-    nbrs.push_back(p.shift( 0,  1,  0,  0));
-    nbrs.push_back(p.shift( 0,  0, -1,  0));
-    nbrs.push_back(p.shift( 0,  0,  1,  0));
-    nbrs.push_back(p.shift( 0,  0,  0, -1));
-    nbrs.push_back(p.shift( 0,  0,  0,  1));
+    size_t n{0};
+    if(p.w != 0)    nbrs[n++] = p.shift(-1,  0,  0,  0);
+    if(p.w != b)    nbrs[n++] = p.shift( 1,  0,  0,  0);
+    nbrs[n++] = p.shift( 0, -1,  0,  0);
+    nbrs[n++] = p.shift( 0,  1,  0,  0);
+    nbrs[n++] = p.shift( 0,  0, -1,  0);
+    nbrs[n++] = p.shift( 0,  0,  1,  0);
+    nbrs[n++] = p.shift( 0,  0,  0, -1);
+    nbrs[n++] = p.shift( 0,  0,  0,  1);
 }
 
 
@@ -71,15 +71,15 @@ template<>
 void Cubic4d<2>::setNbrs(size_t i) 
 {
     Point4d p{i, length};
-    nbrs.clear();
-    if(p.w != 0)    nbrs.push_back(p.shift(-1,  0,  0,  0));
-    if(p.w != b)    nbrs.push_back(p.shift( 1,  0,  0,  0));
-    if(p.x != 0)    nbrs.push_back(p.shift( 0, -1,  0,  0));
-    if(p.x != b)    nbrs.push_back(p.shift( 0,  1,  0,  0));
-    nbrs.push_back(p.shift( 0,  0, -1,  0));
-    nbrs.push_back(p.shift( 0,  0,  1,  0));
-    nbrs.push_back(p.shift( 0,  0,  0, -1));
-    nbrs.push_back(p.shift( 0,  0,  0,  1));
+    size_t n{0};
+    if(p.w != 0)    nbrs[n++] = p.shift(-1,  0,  0,  0);
+    if(p.w != b)    nbrs[n++] = p.shift( 1,  0,  0,  0);
+    if(p.x != 0)    nbrs[n++] = p.shift( 0, -1,  0,  0);
+    if(p.x != b)    nbrs[n++] = p.shift( 0,  1,  0,  0);
+    nbrs[n++] = p.shift( 0,  0, -1,  0);
+    nbrs[n++] = p.shift( 0,  0,  1,  0);
+    nbrs[n++] = p.shift( 0,  0,  0, -1);
+    nbrs[n++] = p.shift( 0,  0,  0,  1);
 }
 
 /* PBC in one directions: 
@@ -100,15 +100,15 @@ template<>
 void Cubic4d<1>::setNbrs(size_t i) 
 {
     Point4d p{i, length};
-    nbrs.clear();
-    if(p.w != 0)    nbrs.push_back(p.shift(-1,  0,  0,  0));
-    if(p.w != b)    nbrs.push_back(p.shift( 1,  0,  0,  0));
-    if(p.x != 0)    nbrs.push_back(p.shift( 0, -1,  0,  0));
-    if(p.x != b)    nbrs.push_back(p.shift( 0,  1,  0,  0));
-    if(p.y != 0)    nbrs.push_back(p.shift( 0,  0, -1,  0));
-    if(p.y != b)    nbrs.push_back(p.shift( 0,  0,  1,  0));
-    nbrs.push_back(p.shift( 0,  0,  0, -1));
-    nbrs.push_back(p.shift( 0,  0,  0,  1));
+    size_t n{0};
+    if(p.w != 0)    nbrs[n++] = p.shift(-1,  0,  0,  0);
+    if(p.w != b)    nbrs[n++] = p.shift( 1,  0,  0,  0);
+    if(p.x != 0)    nbrs[n++] = p.shift( 0, -1,  0,  0);
+    if(p.x != b)    nbrs[n++] = p.shift( 0,  1,  0,  0);
+    if(p.y != 0)    nbrs[n++] = p.shift( 0,  0, -1,  0);
+    if(p.y != b)    nbrs[n++] = p.shift( 0,  0,  1,  0);
+    nbrs[n++] = p.shift( 0,  0,  0, -1);
+    nbrs[n++] = p.shift( 0,  0,  0,  1);
 }
 
 
@@ -132,15 +132,15 @@ template<>
 void Cubic4d<0>::setNbrs(size_t i) 
 {
     Point4d p{i, length};
-    nbrs.clear();
-    if(p.w != 0)    nbrs.push_back(p.shift(-1,  0,  0,  0));
-    if(p.w != b)    nbrs.push_back(p.shift( 1,  0,  0,  0));
-    if(p.x != 0)    nbrs.push_back(p.shift( 0, -1,  0,  0));
-    if(p.x != b)    nbrs.push_back(p.shift( 0,  1,  0,  0));
-    if(p.y != 0)    nbrs.push_back(p.shift( 0,  0, -1,  0));
-    if(p.y != b)    nbrs.push_back(p.shift( 0,  0,  1,  0));
-    if(p.z != 0)    nbrs.push_back(p.shift( 0,  0,  0, -1));
-    if(p.z != b)    nbrs.push_back(p.shift( 0,  0,  0,  1));
+    size_t n{0};
+    if(p.w != 0)    nbrs[n++] = p.shift(-1,  0,  0,  0);
+    if(p.w != b)    nbrs[n++] = p.shift( 1,  0,  0,  0);
+    if(p.x != 0)    nbrs[n++] = p.shift( 0, -1,  0,  0);
+    if(p.x != b)    nbrs[n++] = p.shift( 0,  1,  0,  0);
+    if(p.y != 0)    nbrs[n++] = p.shift( 0,  0, -1,  0);
+    if(p.y != b)    nbrs[n++] = p.shift( 0,  0,  1,  0);
+    if(p.z != 0)    nbrs[n++] = p.shift( 0,  0,  0, -1);
+    if(p.z != b)    nbrs[n++] = p.shift( 0,  0,  0,  1);
 }
 
 

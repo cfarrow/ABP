@@ -12,13 +12,18 @@
 #define LATTICEREGULAR_H
 
 #include "Lattice.h"
-#include <vector>
 
 class LatticeRegular: public Lattice
 {
     public:
-        LatticeRegular(size_t size, size_t id = 0) : Lattice( size, id ) {}
-        virtual ~LatticeRegular() {}
+        LatticeRegular(size_t size, size_t id=0, size_t nn=0) 
+        : Lattice( size, id ), num_neighbors(nn) {
+            nbrs = new size_t [num_neighbors];
+            last = num_sites;
+        }
+        virtual ~LatticeRegular() {
+            delete [] nbrs;
+        }
         
         /* virtual functions */
         virtual void activateSites() {
@@ -27,14 +32,14 @@ class LatticeRegular: public Lattice
         }
         
         /* virtual function - defined below */
-        virtual size_t getNumNeighbors( size_t); 
+        virtual size_t getNumNeighbors(size_t) = 0; 
         virtual size_t getNbr(size_t, size_t);
-        virtual size_t getNumActiveNeighbors(size_t i);
+        virtual size_t getNumActiveNeighbors(size_t);
 
     protected:
          size_t num_neighbors;
          size_t last;
-         std::vector <size_t> nbrs; /* holds the neighbor tags for a given site */
+         size_t* nbrs;
          virtual void setNbrs(size_t) {};
 
 };

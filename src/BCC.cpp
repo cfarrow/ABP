@@ -89,6 +89,7 @@ template <>
 void BCC<2>::setNbrs(size_t i) 
 {
     Point3d p{i, length};
+    size_t n{0};
     bool is_A = p.z % 2 == 0;
     int m = is_A ? -1 : 1;  // Multiply by -1 for A lattice
     short sx, sy;
@@ -96,13 +97,12 @@ void BCC<2>::setNbrs(size_t i)
     bool botm_face = is_A && p.z == 0;
     bool top_face = !is_A && p.z == b;
 
-    nbrs.clear();
     for(int j=0; j<4; j++)
     {
         sx = m * B_shifts[j][0];
         sy = m * B_shifts[j][1];
-        if(!botm_face)  nbrs.push_back(p.shift(sx, sy, -1));
-        if(!top_face)   nbrs.push_back(p.shift(sx, sy,  1));
+        if(!botm_face)  nbrs[n++] = p.shift(sx, sy, -1);
+        if(!top_face)   nbrs[n++] = p.shift(sx, sy,  1);
     }
 }
 
@@ -138,6 +138,7 @@ template<>
 void BCC<1>::setNbrs(size_t i) 
 {
     Point3d p{i, length};
+    size_t n{0};
     bool is_A = p.z % 2 == 0;
     int m = is_A ? -1 : 1;  // Multiply by -1 for A lattice
     short sx, sy;
@@ -147,19 +148,17 @@ void BCC<1>::setNbrs(size_t i)
     bool front_face = is_A && p.y == 0;
     bool back_face = !is_A && p.y == b;
 
-    nbrs.clear();
-
     for(int j=0; j<4; j++)
     {
         sx = m * B_shifts[j][0];
         sy = m * B_shifts[j][1];
         // Boundary conditions for A sublattice
         if(!botm_face && !(front_face && sy == -1))
-            nbrs.push_back(p.shift(sx, sy, -1));
+            nbrs[n++] = p.shift(sx, sy, -1);
 
         // Boundary conditions for B sublattice
         if(!top_face && !(back_face && sy == 1))
-            nbrs.push_back(p.shift(sx, sy, 1));
+            nbrs[n++] = p.shift(sx, sy, 1);
     }
 }
 
@@ -202,8 +201,8 @@ size_t BCC<0>::getNumNeighbors(size_t i) {
 template<>
 void BCC<0>::setNbrs(size_t i) 
 {
-
     Point3d p{i, length};
+    size_t n{0};
     bool is_A = p.z % 2 == 0;
     int m = is_A ? -1 : 1;  // Multiply by -1 for A lattice
     short sx, sy;
@@ -215,7 +214,6 @@ void BCC<0>::setNbrs(size_t i)
     bool left_face = is_A && p.x == 0;
     bool right_face = !is_A && p.x == b;
 
-    nbrs.clear();
     for(int j=0; j<4; j++)
     {
         sx = m * B_shifts[j][0];
@@ -223,11 +221,11 @@ void BCC<0>::setNbrs(size_t i)
 
         // Boundary conditions for A sublattice
         if(!botm_face && !(front_face && sy == -1) && !(left_face && sx == -1))
-            nbrs.push_back(p.shift(sx, sy, -1));
+            nbrs[n++] = p.shift(sx, sy, -1);
 
         // Boundary conditions for B sublattice
         if(!top_face && !(back_face && sy == 1) && !(right_face && sx == 1))
-            nbrs.push_back(p.shift(sx, sy, 1));
+            nbrs[n++] = p.shift(sx, sy, 1);
     }
 }
 

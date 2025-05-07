@@ -39,20 +39,20 @@ template<>
 void UJack<1>::setNbrs(size_t i) 
 {
     Point2d p{i, length};
+    size_t n{0};
 
-    nbrs.clear();
     if(p.x != 0){
-        nbrs.push_back(p.shift(-1,  0));
-        nbrs.push_back(p.shift(-1,  1));
-        nbrs.push_back(p.shift(-1, -1));
+        nbrs[n++] = p.shift(-1,  0);
+        nbrs[n++] = p.shift(-1,  1);
+        nbrs[n++] = p.shift(-1, -1);
     }
     if(p.x != b){
-        nbrs.push_back(p.shift( 1,  0));
-        nbrs.push_back(p.shift( 1, -1));
-        nbrs.push_back(p.shift( 1,  1));
+        nbrs[n++] = p.shift( 1,  0);
+        nbrs[n++] = p.shift( 1, -1);
+        nbrs[n++] = p.shift( 1,  1);
     }
-    nbrs.push_back(p.shift( 0, -1));
-    nbrs.push_back(p.shift( 0,  1));
+    nbrs[n++] = p.shift( 0, -1);
+    nbrs[n++] = p.shift( 0,  1);
 }
 
 
@@ -81,15 +81,15 @@ template<>
 void UJack<0>::setNbrs(size_t i) 
 {
     Point2d p{i, length};
-    nbrs.clear();
-    if(p.x != 0)                nbrs.push_back(p.shift(-1,  0));
-    if(p.x != b)                nbrs.push_back(p.shift( 1,  0));
-    if(p.y != 0)                nbrs.push_back(p.shift( 0, -1));
-    if(p.y != b)                nbrs.push_back(p.shift( 0,  1));
-    if(p.x != 0 && p.y != b)    nbrs.push_back(p.shift(-1,  1));
-    if(p.x != b && p.x != 0)    nbrs.push_back(p.shift( 1, -1));
-    if(p.x != b && p.y != b)    nbrs.push_back(p.shift( 1,  1));
-    if(p.x != 0 && p.y != 0)    nbrs.push_back(p.shift(-1, -1));
+    size_t n{0};
+    if(p.x != 0)                nbrs[n++] = p.shift(-1,  0);
+    if(p.x != b)                nbrs[n++] = p.shift( 1,  0);
+    if(p.y != 0)                nbrs[n++] = p.shift( 0, -1);
+    if(p.y != b)                nbrs[n++] = p.shift( 0,  1);
+    if(p.x != 0 && p.y != b)    nbrs[n++] = p.shift(-1,  1);
+    if(p.x != b && p.x != 0)    nbrs[n++] = p.shift( 1, -1);
+    if(p.x != b && p.y != b)    nbrs[n++] = p.shift( 1,  1);
+    if(p.x != 0 && p.y != 0)    nbrs[n++] = p.shift(-1, -1);
 }
 
 

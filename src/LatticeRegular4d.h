@@ -9,16 +9,14 @@
 #include <cmath>
 #include "LatticeRegular.h"
 
+
 class LatticeRegular4d: public LatticeRegular
 {
     public:
         LatticeRegular4d(size_t len, size_t id=0, size_t nn=0) 
-        : LatticeRegular(len*len*len*len, id) {
+        : LatticeRegular(len*len*len*len, id, nn) {
             length = static_cast<size_t>(ceil(pow(num_sites, 0.25)));
             b = length - 1;
-            num_neighbors = nn;
-            nbrs.resize(num_neighbors);
-            last = num_sites;
         }
         virtual ~LatticeRegular4d() {}
 

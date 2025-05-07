@@ -10,7 +10,7 @@ in 2, 3, and 4 dimensions.
 
 
 /* Utility for putting a value between 0 (inclusive) and len (exclusive) */
-static inline int bounded(int v, size_t len)
+static inline int bounded(int v, int len)
 {
     v = v < 0 ? v + len : v;
     v = v >= len ? v % len : v;

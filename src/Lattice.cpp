@@ -114,47 +114,8 @@ void Lattice::setPresentLevel(size_t i, bool new_level) {
 	return;
 }
 
-/* Returns the number of neighbors of site i
-*/
-size_t getNumNeighbors( size_t i)
-{
-    //DEFINE IN DERIVED CLASS
-    return 0;
-}
-
-
-/* Returns neighbor number j of site i. 
- * See LatticeRegular.h for an example.
-*/
-size_t Lattice::getNbr(size_t i, size_t j) 
-{
-    //DEFINE IN DERIVED CLASS
-    return 0;
-}
-
-
-/* Return number of active neighbors around site i.
- * See LatticeRegular.h for an example.
-*/
-size_t Lattice::getNumActiveNeighbors(size_t i) 
-{
-    //DEFINE IN DERIVED CLASS
-    return 0;
-}
-
-
-/* This function returns the number of neighbors of a site.
- * See LatticeRegular.h for an example.
-*/
-size_t Lattice::getNumNeighbors(size_t i)
-{
-    //DEFINE IN DERIVED CLASS
-    return 0;
-}
-
 
 Lattice::~Lattice() {
-		 
 	if( cluster_label != 0 ) delete [] cluster_label;
 	delete [] active;
 	delete [] present;
@@ -260,15 +221,4 @@ void Lattice::labelClusters(size_t a) {
   } /* for i0 */
 
   return;
-}
-
-/* ---------------------------------------------------------------*\
-  Check to see if the largest cluster is a spanning cluster.
-  Looks to see if a site from both the top and bottom row (plane)
-  are on the largest cluster. This must be defined in the specific
-  lattice-type class (see Triangular.cpp for an example.)
-\* ---------------------------------------------------------------*/
-bool Lattice::isSpanning(size_t i){
-    //DEFINE IN DERIVED CLASS
-    return false;
 }

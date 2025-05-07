@@ -48,54 +48,60 @@ void set_site_value(size_t site_index, bool value, size_t* words);
 
 class Lattice 
 {
-    public:
-         /* The second entry is for an optional type identifier, specified in
+     public:
+          /* The second entry is for an optional type identifier, specified in
           * the program. 
           */
-         Lattice(size_t nsites = 32, size_t id = 0);
-         virtual ~Lattice();
+          Lattice(size_t nsites = 32, size_t id = 0);
+          virtual ~Lattice();
 
-         /* Functions that act on whole lattice */
-         virtual void activateSites(); 
-         virtual void labelClusters(size_t=1);
-         size_t getLength() {return length;}   	 
-         size_t getNumSites() {return num_sites;}
-         size_t getNumActive() {return num_active_sites;}
-         size_t getNumPresent() {return num_present_sites;}
-         size_t getNumClusters() {return Clusters.size();}
-         size_t getMaxMass() {return (Clusters.empty() ? 0 : *(max_element(Clusters.begin(), Clusters.end()))); }
+          /* Functions that act on whole lattice */
+          virtual void activateSites(); 
+          virtual void labelClusters(size_t=1);
+          size_t getLength() {return length;}   	 
+          size_t getNumSites() {return num_sites;}
+          size_t getNumActive() {return num_active_sites;}
+          size_t getNumPresent() {return num_present_sites;}
+          size_t getNumClusters() {return Clusters.size();}
+          size_t getMaxMass() {return (Clusters.empty() ? 0 : *(max_element(Clusters.begin(), Clusters.end()))); }
 
-         /* Functions that act on single sites */
-         bool isActive(size_t);
-         bool isPresent(size_t);
-         /* the following do not do any checking. It is up to the algorithm. 'if' statements slow things down! */
-         void setActiveLevel(size_t, bool);
-         void setPresentLevel(size_t, bool);
-         /* get cluster label of site */
-         size_t getClusterLabel(size_t i) {return cluster_label[i]; }
-         /* get size of cluster, as referenced by its label */
-         size_t getClusterSize(size_t i) {return Clusters[i]; }
+          /* Functions that act on single sites */
+          bool isActive(size_t);
+          bool isPresent(size_t);
+          /* the following do not do any checking. It is up to the algorithm. 'if' statements slow things down! */
+          void setActiveLevel(size_t, bool);
+          void setPresentLevel(size_t, bool);
+          /* get cluster label of site */
+          size_t getClusterLabel(size_t i) {return cluster_label[i]; }
+          /* get size of cluster, as referenced by its label */
+          size_t getClusterSize(size_t i) {return Clusters[i]; }
 
-         /* virtual functions */
-         virtual bool isSpanning(size_t = 1);
 
-         /* virtual function - see notes below */
-         virtual size_t getNumNeighbors(size_t); 
-         virtual size_t getNbr(size_t, size_t);
-         virtual size_t getNumActiveNeighbors(size_t);
+          /* ---------------------------------------------------------------*\
+          Check to see if the largest cluster is a spanning cluster.
+          Looks to see if a site from both the top and bottom row (plane)
+          are on the largest cluster. This must be defined in the specific
+          lattice-type class (see Triangular.cpp for an example.)
+          \* ---------------------------------------------------------------*/
+          virtual bool isSpanning(size_t = 1) = 0;
 
-    protected: /* These are direcly callable/mutable by derived classes */
-         size_t length;			/* length of lattice - if applicable */
-         size_t graph_id;         /* number id of graph, could represent type */
-         size_t num_sites;		/* number of sites	*/
-         size_t num_words;
-         size_t num_active_sites;	/* number of active sites */
-         size_t num_present_sites;	/* number of present sites */
+          /* virtual function - see notes below */
+          virtual size_t getNumNeighbors(size_t) = 0; 
+          virtual size_t getNbr(size_t, size_t) = 0;
+          virtual size_t getNumActiveNeighbors(size_t) = 0;
 
-         size_t *active;				/* active indicator */
-         size_t *present;			/* present indicator */
-         size_t *cluster_label; /* array of cluster labels. Initialized in labelClusters */
-         std::vector < size_t > Clusters;
+     protected: /* These are direcly callable/mutable by derived classes */
+          size_t length;			/* length of lattice - if applicable */
+          size_t graph_id;         /* number id of graph, could represent type */
+          size_t num_sites;		/* number of sites	*/
+          size_t num_words;
+          size_t num_active_sites;	/* number of active sites */
+          size_t num_present_sites;	/* number of present sites */
+
+          size_t *active;				/* active indicator */
+          size_t *present;			/* present indicator */
+          size_t *cluster_label; /* array of cluster labels. Initialized in labelClusters */
+          std::vector < size_t > Clusters;
 };
 
 #endif

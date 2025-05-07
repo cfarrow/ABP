@@ -1,14 +1,4 @@
 #include "LatticeRegular.h"
-#include <vector>
-#include <cmath>
-
-size_t LatticeRegular::getNumNeighbors( size_t i) { 
-    if( last != i ) {
-        setNbrs(i);
-        last = i;
-    }
-    return nbrs.size();
-}
 
 /* For regular graphs, the convention is to create an array of neighbors of site
  * i with this function. It then is called whenever a neighbor is needed. This

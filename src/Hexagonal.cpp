@@ -51,12 +51,12 @@ void Hexagonal<1>::setNbrs(size_t i)
 {
     Point2d p{i, length};
     bool left = (p.x + p.y) % 2;
+    size_t n{0};
 
-    nbrs.clear();
-    nbrs.push_back(p.shift( 0, -1));
-    nbrs.push_back(p.shift( 0,  1));
-    if( left && p.x != 0)   nbrs.push_back(p.shift(-1, 0));
-    if(!left && p.x != b)   nbrs.push_back(p.shift( 1, 0));
+    nbrs[n++] = p.shift( 0, -1);
+    nbrs[n++] = p.shift( 0,  1);
+    if( left && p.x != 0)   nbrs[n++] = p.shift(-1, 0);
+    if(!left && p.x != b)   nbrs[n++] = p.shift( 1, 0);
 }
 
 
@@ -78,13 +78,13 @@ template<>
 void Hexagonal<0>::setNbrs(size_t i) 
 {
     Point2d p{i, length};
+    size_t n{0};
     bool left = (p.x + p.y) % 2;
 
-    nbrs.clear();
-    if(p.y != 0)            nbrs.push_back(p.shift( 0, -1));
-    if(p.y != b)            nbrs.push_back(p.shift( 0,  1));
-    if( left && p.x != 0)   nbrs.push_back(p.shift(-1,  0));
-    if(!left && p.x != b)   nbrs.push_back(p.shift( 1,  0));
+    if(p.y != 0)            nbrs[n++] = p.shift( 0, -1);
+    if(p.y != b)            nbrs[n++] = p.shift( 0,  1);
+    if( left && p.x != 0)   nbrs[n++] = p.shift(-1,  0);
+    if(!left && p.x != b)   nbrs[n++] = p.shift( 1,  0);
 }
 
 
