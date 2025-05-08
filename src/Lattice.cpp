@@ -159,7 +159,7 @@ void Lattice::labelClusters(size_t a) {
 	if( a > 1 ) { a = 1; }
 
     std::queue< size_t > CQ; /* The cluster queue */
-	size_t s1, s2; /* for holding sites */
+	size_t s1; /* for holding sites */
 	size_t num_clusters = 0;
 
 	/* initialize to large label */
@@ -195,8 +195,7 @@ void Lattice::labelClusters(size_t a) {
 			   two sites is length-1, then they must be in in the top and 
 			   bottom planes, respectivley.
 			 */
-			for( size_t j=0; j < getNumNeighbors(s1); j++) {
-				s2 = getNbr(s1, j);
+			for(size_t s2 : getNbrs(s1)) {
 				if( isActive(s2) == a && cluster_label[s2] == num_sites && 
 					(size_t) abs(static_cast<int>(s1%length) - static_cast<int>(s2%length)) != length-1 ) {
 									 

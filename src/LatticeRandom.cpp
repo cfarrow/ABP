@@ -2,11 +2,10 @@
 #include <queue>
 
 size_t LatticeRandom::getNumActiveNeighbors(size_t i) {
-    size_t nn = getNumNeighbors( i );
     size_t count = 0;
-    for(size_t j=0; j < nn; j++ )
+	for(size_t j : getNbrs(i))
     {
-        if( isActive( getNbr(i, j) ) ) count++;
+        if( isActive( j ) ) count++;
     }
     return count;
 }
@@ -33,7 +32,7 @@ void LatticeRandom::labelClusters(size_t a) {
 	if( a > 1 ) { a = 1; }
 
     std::queue< size_t > CQ; /* The cluster queue */
-	size_t s1, s2; /* for holding sites */
+	size_t s1; /* for holding sites */
 	size_t num_clusters = 0;
 
 	/* initialize to large label */
@@ -63,8 +62,7 @@ void LatticeRandom::labelClusters(size_t a) {
 			s1 = CQ.front();
 			CQ.pop();
 
-			for( size_t j=0; j < getNumNeighbors(s1); j++) {
-				s2 = getNbr(s1, j);
+			for(size_t s2 : getNbrs(s1)) {
 				if( isActive(s2) == a && cluster_label[s2] == num_sites ) {
 									 
 					/* label this site and count its mass */

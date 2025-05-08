@@ -26,8 +26,9 @@
 #ifndef LATTICE_H
 #define LATTICE_H
 
-#include<vector>
-#include<algorithm>
+#include <vector>
+#include <algorithm>
+#include "Neighbors.h"
 
 
 /* ============================= Utilities ================================== */
@@ -89,6 +90,7 @@ class Lattice
           virtual size_t getNumNeighbors(size_t) = 0; 
           virtual size_t getNbr(size_t, size_t) = 0;
           virtual size_t getNumActiveNeighbors(size_t) = 0;
+          virtual Neighbors getNbrs(size_t) = 0;
 
      protected: /* These are direcly callable/mutable by derived classes */
           size_t length;			/* length of lattice - if applicable */
@@ -103,5 +105,4 @@ class Lattice
           size_t *cluster_label; /* array of cluster labels. Initialized in labelClusters */
           std::vector < size_t > Clusters;
 };
-
 #endif

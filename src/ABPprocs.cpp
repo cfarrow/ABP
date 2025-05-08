@@ -49,7 +49,7 @@ void collectToQueue (Lattice *L, queue< size_t > &Q, size_t cull) {
 size_t cullSites(Lattice *L, queue< size_t > &Q, size_t cull) {
 
   size_t culled = 0;
-  size_t s1, s2;
+  size_t s1;
 
   while (!Q.empty()) {		/* while queue still has sites  */
 
@@ -59,8 +59,7 @@ size_t cullSites(Lattice *L, queue< size_t > &Q, size_t cull) {
 
       /* Now check all neighbor sites of the recently culled site and send them to the
          culling queue if they don't meet the culling condition.                         */
-      for (size_t j = 0; j < L->getNumNeighbors(s1); j++) { 
-		 s2 = L->getNbr(s1,j);
+	  for( auto s2 : L->getNbrs(s1)) {
 		 if ( L->isActive(s2) && L->getNumActiveNeighbors(s2) < cull) {
 			 Q.push(s2);
 			 L->setActiveLevel(s2,0);

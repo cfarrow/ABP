@@ -22,14 +22,14 @@ void CubRand::Setup(double fb)
     /* This snippet of code makes the neighbor double array
      * sequential in memory. This speeds things up a bit.
      */
-    nbr_ref = new int [num_sites * max_neighbors];
+    nbr_ref = new size_t [num_sites * max_neighbors];
     if( nbr_ref == NULL ) { 
         std::cerr << "Memory alocation error!" << std::endl;
         exit(1);
     }
     for( size_t i=0; i < num_sites * max_neighbors; i++ ) nbr_ref[i] = -1;
 
-    neighbor = new int* [num_sites];
+    neighbor = new size_t* [num_sites];
     if( neighbor == NULL ) { 
         std::cerr << "Memory alocation error!" << std::endl;
         exit(1);

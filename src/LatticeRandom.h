@@ -17,6 +17,7 @@
 #define LATTICERANDOM_H
 
 #include "Lattice.h"
+#include "Neighbors.h"
 
 class LatticeRandom: public Lattice
 {
@@ -24,6 +25,7 @@ class LatticeRandom: public Lattice
         LatticeRandom(size_t nsites, size_t id = 0) : Lattice(nsites, id) {}
         virtual ~LatticeRandom() {}
         
+
         // These functions are specific to this class
         virtual void generateBonds();
         virtual bool isGiant() {
@@ -32,18 +34,18 @@ class LatticeRandom: public Lattice
            else return false;
         }
         
-        virtual size_t getNbr(size_t i, size_t j) { 
-            return neighbor[i][j]; 
+        Neighbors getNbrs(size_t i) { 
+            return Neighbors(neighbor[i], getNumNeighbors(i)); 
         }
-        
+        virtual size_t getNbr(size_t i, size_t j) { return neighbor[i][j]; }
         virtual size_t getNumActiveNeighbors(size_t i);
         virtual bool isSpanning(size_t = 1){ return isGiant();}
         virtual void labelClusters(size_t = 1);
 
     protected:
         size_t max_neighbors; // Maximum # of neighbors for a site.
-        int *nbr_ref; //Helps make data sequential in memory, will speed up program.
-        int **neighbor; //The actual neighbor table.
+        size_t *nbr_ref; //Helps make data sequential in memory, will speed up program.
+        size_t **neighbor; //The actual neighbor table.
 };
 
 #endif

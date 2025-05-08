@@ -23,7 +23,7 @@ void SWNetwork::Setup(size_t _dim, double _alpha, double _gamma)
     /* This snippet of code makes the neighbor double array
      * sequential in memory. This speeds things up a bit.
      */
-    nbr_ref = new int [num_sites * max_neighbors];
+    nbr_ref = new size_t [num_sites * max_neighbors];
     if( nbr_ref == NULL ) { 
         std::cerr << "Memory alocation error!" << std::endl;
         exit(1);
@@ -33,7 +33,7 @@ void SWNetwork::Setup(size_t _dim, double _alpha, double _gamma)
         nbr_ref[i] = -1;
     }
 
-    neighbor = new int* [num_sites];
+    neighbor = new size_t* [num_sites];
     if( neighbor == NULL ) { 
         std::cerr << "Memory alocation error!" << std::endl;
         exit(1);

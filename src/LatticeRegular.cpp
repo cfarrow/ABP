@@ -18,6 +18,18 @@ size_t LatticeRegular::getNbr(size_t i, size_t j)
     return nbrs[j];
 }
 
+
+Neighbors LatticeRegular::getNbrs(size_t i)
+{
+    if( last != i ) {
+        setNbrs(i);
+        last = i;
+    }
+
+    return Neighbors(nbrs, getNumNeighbors(i));
+}
+
+
 size_t LatticeRegular::getNumActiveNeighbors(size_t i) 
 {
 
