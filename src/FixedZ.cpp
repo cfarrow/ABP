@@ -8,12 +8,11 @@
  * 08/01/05 Created this as a subclass of Lattice.
 */
 
-#include "FixedZ.h"
-#include "MersenneTwister.h"
-#include "utils.h"
-#include <vector>
 #include <iostream>
-#include <cmath>
+
+#include "FixedZ.h"
+#include "rand.h"
+#include "utils.h"
 
 void FixedZ::Setup(size_t z)
 {
@@ -73,7 +72,7 @@ void FixedZ::generateBonds()
 {
 
     size_t i, k, sites_to_choose = num_sites;
-    static MTRand mtRNG;
+    rng_type rng = makeRNG(7);
 
     for( size_t i = 0; i < num_sites; i++ ) {
         coordination[i] = 0;
@@ -83,14 +82,14 @@ void FixedZ::generateBonds()
     for( size_t bond = 0; bond < max_neighbors; bond++ ) {
         for( size_t count = 0; count < num_sites/2; count++ ) {
             /* pick a random site */
-            i = static_cast< size_t >( mtRNG.randExc( sites_to_choose ) );
+            i = rng(0, sites_to_choose);
             sites_to_choose--;
             /* put that value at the top of the choose list */
             swap( choose_i[i], choose_i[sites_to_choose] );
             i = choose_i[sites_to_choose];
 
             /* pick a different site */
-            k = static_cast< size_t >( mtRNG.randExc( sites_to_choose ) );
+            k =rng(0, sites_to_choose);
             sites_to_choose--;
             /* put that value at the top of the choose list */
             swap( choose_i[k], choose_i[sites_to_choose] );

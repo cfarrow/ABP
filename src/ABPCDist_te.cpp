@@ -18,7 +18,7 @@
 #include <numeric>
 #include "Lattice.h"  /* compile with "Lattice.cpp" */
 #include "ABPprocs.h" /* compile with "ABPprocs.cpp" */
-#include "MersenneTwister.h"
+#include "rand.h"
 
 using namespace std;
 
@@ -41,8 +41,7 @@ int main(int argc, char **argv) {
 
 
 	/* seed and name the rng */
-	MTRand();
-	MTRand mtRNG;
+	bounded_rng_type rng = makeRNG(7, 0, num_sites-1);
 
 	size_t a_size = 0;
 	size_t a_max = 0;
@@ -69,7 +68,7 @@ int main(int argc, char **argv) {
 		   in the vector a_dist. */
 
 		while( Lat1->getNumActive() > 0 ) {
-			removeActiveSite(Lat1, CullingQ, t, k, mtRNG);
+			removeActiveSite(Lat1, CullingQ, t, k, rng);
 			a_size = cullSites(Lat1, CullingQ, mcull) - 1;
             ++a_dist[a_size];
             if(a_size > a_max) a_max = a_size;

@@ -12,7 +12,7 @@
 #include <queue>
 #include "Lattice.h"  /* compile with "Lattice.cpp" */
 #include "ABPprocs.h" /* compile with "ABPprocs.cpp" */
-#include "MersenneTwister.h"
+#include "rand.h"
 using namespace std;
 
 int main(int argc, char **argv) {
@@ -56,8 +56,7 @@ int main(int argc, char **argv) {
         k_max[i] = 0.0;
     }
 
-	MTRand(7);
-	MTRand mtRNG;
+	bounded_rng_type rng = makeRNG(7, 0, num_sites-1);
 	for( size_t smpl = 0; smpl < num_samples; smpl++ ) {
 	
 		cout << "sample " << smpl+1 << endl;
@@ -67,7 +66,7 @@ int main(int argc, char **argv) {
 		k = 0;
 
 		while( Lat1->getNumActive() > 0 ) {
-			removeActiveSite(Lat1, CullingQ, t, k, mtRNG);
+			removeActiveSite(Lat1, CullingQ, t, k, rng);
 			a_size = cullSites(Lat1, CullingQ, mcull) - 1;
             if(a_size > a_max[smpl]) {
                 a_max[smpl] = a_size;

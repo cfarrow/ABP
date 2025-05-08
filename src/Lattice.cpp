@@ -13,12 +13,9 @@
 
 */
 
-#include <cstdio>
 #include <iostream>
 #include <queue>
-#include <vector>
 
-#include "MersenneTwister.h"
 #include "Lattice.h"
 
 

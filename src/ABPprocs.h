@@ -1,9 +1,10 @@
 #ifndef ABPPROCS_H
 #define ABPPROCS_H
 
-#include "Lattice.h"
-#include "MersenneTwister.h"
 #include <queue>
+
+#include "Lattice.h"
+#include "rand.h"
 
 /* Class for holding graph info. */
 class GraphInfo
@@ -44,8 +45,7 @@ class GraphInfo
 };
 
 
-
-size_t removeActiveSite( Lattice *L, std::queue< size_t > &Q, size_t &t, size_t &k, MTRand &mtRNG);
+size_t removeActiveSite( Lattice *L, std::queue< size_t > &Q, size_t &t, size_t &k, bounded_rng_type& rng);
 void collectToQueue( Lattice *L, std::queue< size_t > &Q, size_t cull );
 size_t cullSites( Lattice *L, std::queue< size_t > &Q, size_t cull );
 void promptLength( size_t &len );

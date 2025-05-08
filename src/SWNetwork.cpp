@@ -1,9 +1,9 @@
-#include "SWNetwork.h"
-#include "MersenneTwister.h"
-#include "utils.h"
-#include <vector>
 #include <iostream>
-#include <cmath>
+#include <random>
+
+#include "SWNetwork.h"
+#include "rand.h"
+#include "utils.h"
 
 // TODO
 
@@ -96,7 +96,11 @@ void SWNetwork::generateBonds() {
 
     size_t half_length = length/2;
 
-    static MTRand mtRNG;
+	static std::mt19937_64 gen(7);
+	static std::uniform_real_distribution<double> dist(0.0, 1.0);
+	auto prng = [&]() { return dist(gen); };
+
+    bounded_rng_type rng = makeRNG(7, 0, num_sites-1);
 
     // Separation of bonds into short and long ones.
     double bond_len, bond_mod;
@@ -131,10 +135,10 @@ void SWNetwork::generateBonds() {
             kounter++;
 
             // NOTE: A new starting site is chosen at each trial 
-            isite= static_cast<size_t>(mtRNG.randExc(num_sites));
+            isite = rng();
 
             // Now choose the OTHER site.
-            if( mtRNG.rand() < p_s) {   
+            if( prng() < p_s) {   
                 // use method for short bonds Loop over short bonds and pick one
                 // with probability short_bond_weight[]
                 total_weight = 0.0;
@@ -159,7 +163,7 @@ void SWNetwork::generateBonds() {
 
                 if(total_weight > 0.0) {
                     // Normalize and choose one
-                    rweight = mtRNG.rand();
+                    rweight = prng();
                     psum = 0.0;
                     for(b_label=0; b_label < short_bond_label.size(); b_label++) {
                         short_bond_weight[b_label] /= total_weight;
@@ -186,16 +190,16 @@ void SWNetwork::generateBonds() {
                 do {
                     if(alpha == ddim) { 
                         // special case: P ~ 1/r => Integral ~ ln(r)
-                        bond_len= pow(1.0*half_length+1.0,mtRNG.rand());
+                        bond_len= pow(1.0*half_length+1.0,prng());
                     }
                     else { // normal case: P ~ 1/r^kappa with kappa!=1
-                        bond_len= pow(lambda*mtRNG.rand()+1.0,dexponent);
+                        bond_len= pow(lambda*prng()+1.0,dexponent);
                     }
                     // 2) Generate random d-dimensional versor
                     do{
                         bond_mod = 0.0;
                         for(dir=0;dir<(size_t)dim;dir++) {
-                            vctr_coord[dir]=2*mtRNG.rand()-1.0;
+                            vctr_coord[dir]=2*prng()-1.0;
                             bond_mod += pow(vctr_coord[dir], 2.0);
                         }
                     // Within unit sphere? - If not, discard!

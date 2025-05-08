@@ -16,7 +16,7 @@
 #include <numeric>
 #include "Lattice.h"  /* compile with "Lattice.cpp" */
 #include "ABPprocs.h" /* compile with "ABPprocs.cpp" */
-#include "MersenneTwister.h" /* compile with "ABPprocs.cpp" */
+#include "rand.h"
 
 using namespace std;
 
@@ -59,8 +59,7 @@ int main(int argc, char **argv) {
 	len = Lat1->getLength();
 
 	/* seed and name the rng */
-	MTRand();
-	MTRand mtRNG;
+	bounded_rng_type rng = makeRNG(7, 0, num_sites-1);
 
 	size_t a_size = 0;
 	size_t a_max = 0;
@@ -100,7 +99,7 @@ int main(int argc, char **argv) {
 		   in the vector avalanches. */
 
 		while( Lat1->getNumActive() > 0 ) {
-			removeActiveSite(Lat1, CullingQ, t, k, mtRNG);
+			removeActiveSite(Lat1, CullingQ, t, k, rng);
 			a_size = cullSites(Lat1, CullingQ, mcull) - 1;
 			tau = (1.0*t)/num_sites;
 			for( size_t j = 1; j < t_range; j++) {

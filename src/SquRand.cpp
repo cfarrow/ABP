@@ -1,9 +1,9 @@
-#include "SquRand.h"
-#include "MersenneTwister.h"
-#include "utils.h"
-#include <vector>
 #include <iostream>
-#include <cmath>
+
+#include "SquRand.h"
+#include "rand.h"
+#include "utils.h"
+
 
 void SquRand::Setup(double fb)
 {
@@ -104,13 +104,13 @@ void SquRand::generateBonds() {
     // addition, it can efficiently remove a large number of bonds. The tradeoff
     // is the necessity of a bond list.
     //
-    static MTRand mtRNG;
+    rng_type rng = makeRNG(7);
     int bidx1;
     size_t bonds_left = 2*num_sites;
 
     for(size_t l=0; l < nb; ++l) {
 
-        bidx1 = static_cast< size_t >( mtRNG.randExc( bonds_left ) );
+        bidx1 = rng(0, bonds_left);
         bonds_left--;
         swap( bondlist[bidx1], bondlist[bonds_left] );
     }
@@ -135,13 +135,13 @@ void SquRand::generateBonds() {
         for(int l=0; l < nb/2; ++l)
         {
 
-            bidx1 = static_cast< size_t >( mtRNG.randExc( bonds_to_choose ) );
+            bidx1 = rng(0, bonds_to_choose);
             bidx1 += bonds_left;
             bonds_to_choose--;
             swap( bondlist[bidx1], bondlist[bonds_left + bonds_to_choose] );
             bidx1 = bondlist[bonds_left + bonds_to_choose];
 
-            bidx2 = static_cast< size_t >( mtRNG.randExc( bonds_to_choose ) );
+            bidx2 = rng(0, bonds_to_choose);
             bidx2 += bonds_left;
             bonds_to_choose--;
             swap( bondlist[bidx2], bondlist[bonds_left + bonds_to_choose] );

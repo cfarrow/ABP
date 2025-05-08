@@ -1,16 +1,17 @@
 # CXXFLAGS
+DEFFLAGS = -std=c++20
 OPTFLAGS = -fPIC -O3 -ffast-math -funroll-loops #-fno-inline 
 DBGFLAGS = -g -Wall -Wextra
 
 ifdef OPT
-CXXFLAGS = $(OPTFLAGS)
+CXXFLAGS = $(DEFFLAGS) $(OPTFLAGS)
 else
-CXXFLAGS = $(DBGFLAGS)
+CXXFLAGS = $(DEFFLAGS) $(DBGFLAGS)
 endif
 
 
 # Rules of library files
-OBJS = ABPprocs.o BCC.o Cubic4d.o Cubic.o CubRand.o FixedZ.o Hexagonal.o Square.o SquRand.o SWNetwork.o Triangular.o TriRand.o UJack.o Lattice.o LatticeRegular.o LatticeRegular2d.o LatticeRegular3d.o LatticeRegular4d.o LatticeRandom.o
+OBJS = ABPprocs.o BCC.o Cubic4d.o Cubic.o CubRand.o FixedZ.o Hexagonal.o Square.o SquRand.o SWNetwork.o Triangular.o TriRand.o UJack.o Lattice.o LatticeRegular.o LatticeRegular2d.o LatticeRegular3d.o LatticeRegular4d.o LatticeRandom.o rand.o
 # 2D lattices
 D2OBJS = Hexagonal.o Square.o Triangular.o UJack.o
 # 3D lattices
@@ -25,7 +26,7 @@ RANDOBJS = CubRand.o FixedZ.o SquRand.o SWNetwork.o TriRand.o
 	$(CXX) $(CXXFLAGS) $^ -o $*.out
 
 # library rules
-$(OBJS): MersenneTwister.h Point.h Lattice.h Lattice.cpp
+$(OBJS): Point.h Lattice.h Lattice.cpp rand.h rand.cpp
 $(D2OBJS): LatticeRegular.h LatticeRegular.cpp LatticeRegular2d.h LatticeRegular2d.cpp
 $(D3OBJS): LatticeRegular.h LatticeRegular.cpp LatticeRegular3d.h LatticeRegular3d.cpp
 $(D4OBJS): LatticeRegular.h LatticeRegular.cpp LatticeRegular4d.h LatticeRegular4d.cpp

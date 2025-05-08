@@ -12,10 +12,11 @@
 #include <queue>
 #include <stack>
 #include <numeric>
+
 #include "Lattice.h"  /* compile with "Lattice.cpp" */
 #include "ABPprocs.h" /* compile with "ABPprocs.cpp" */
+#include "rand.h"
 #include "utils.h"
-#include "MersenneTwister.h"
 using namespace std;
 
 /* The global stacks of removed and replaced sites */
@@ -59,9 +60,8 @@ int main(int argc, char **argv) {
         site_map[i] = i;
     }
 
-    MTRand(7);
-    MTRand mtRNG;
-    int num_left, choice;
+    rng_type rng = makeRNG(7);
+    size_t num_left, choice;
     size_t s_max;
 
     for( size_t smpl = 0; smpl < num_samples; smpl++ ) {
@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
         num_left = num_sites;
         while(num_left > 0)
         {
-            choice = static_cast<int>( mtRNG.randExc(num_left) );
+            choice = rng(0, num_left);
             --num_left;
             swap(site_map[choice], site_map[num_left]);
         }

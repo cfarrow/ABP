@@ -1,7 +1,9 @@
-#include <iostream>
-#include <vector>
-#include <queue>
 #include <algorithm>
+#include <iostream>
+#include <queue>
+#include <random>
+#include <vector>
+
 #include "Lattice.h" 
 #include "Hexagonal.h"
 #include "Square.h"
@@ -16,7 +18,8 @@
 #include "SWNetwork.h"
 #include "Cubic4d.h"
 #include "ABPprocs.h"
-#include "MersenneTwister.h" /* fast rng */
+#include "rand.h"
+
 
 using namespace std;
 
@@ -74,15 +77,13 @@ size_t cullSites(Lattice *L, queue< size_t > &Q, size_t cull) {
   return culled;
 }
 
-size_t removeActiveSite( Lattice *L, queue< size_t > &Q, size_t &t, size_t &k , MTRand &mtRNG) {
-
-	static size_t num_sites = L->getNumSites();
+size_t removeActiveSite( Lattice *L, queue< size_t > &Q, size_t &t, size_t &k, bounded_rng_type& rng) {
 	size_t j;
 
 	/* burn sites (set absent) until an active site comes up */
 	do {
 		/* pick a random site */
-		j = static_cast<size_t>( mtRNG.randExc( num_sites ) );
+		j = rng();
 
         /* If it is present, increment k and burn the site. If it is not
          * present, then it is not active. */
@@ -378,4 +379,3 @@ void processCommandLine(int argc, char **argv, size_t &len, size_t &mcull, size_
         cout << "\nThanks!" << endl;
     }
 }
-

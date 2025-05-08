@@ -10,22 +10,22 @@
  05/03/05 Rewrote to be compatible with new class hierarchy for Lattice.
 \* -------------------------------------------------------------------------------*/
 
-#include <iostream>
-#include <iomanip>
-#include <fstream>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
-#include <sstream>
-#include <cmath>
-#include <queue>
-#include <stack>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <numeric>
+#include <queue>
+#include <sstream>
+#include <stack>
+
 #include "Lattice.h"  /* compile with "Lattice.cpp" */
 #include "ABPprocs.h" /* compile with "ABPprocs.cpp" */
-#include "MersenneTwister.h"
+#include "rand.h"
 using namespace std;
 
-/* The global stacks of removed and replaced sites */
 
 /* Prototypes */
 int cullSitesII(Lattice *L, queue< size_t > &Q, size_t m_val,
@@ -82,9 +82,8 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
+	bounded_rng_type rng = makeRNG(7, 0, num_sites-1);
 
-	MTRand();
-	MTRand mtRNG(7);
 	for( size_t smpl = 0; smpl < num_samples; smpl++ ) {
 		k = 0;
 		t = 0;
@@ -101,7 +100,7 @@ int main(int argc, char **argv) {
 		 */
 		   
 		while( Lat1->getNumActive() > 0 ) {
-			removeActiveSite(Lat1, CullingQ, t, k, mtRNG);
+			removeActiveSite(Lat1, CullingQ, t, k, rng);
 			cullSitesII(Lat1, CullingQ, mcull, rem_stack, avalanche_label, t); 
 			k_vs_t[t] = k;
 
