@@ -259,12 +259,12 @@ int main(int argc, char **argv) {
 int cullSitesII(Lattice *L, queue< size_t > &Q, size_t m_val, 
 	stack< size_t > &RemS, size_t Avalanche[], size_t &a_label) {
 
-	size_t s1, s2, n_cul = 0;
+	size_t s1, n_cul = 0;
   
 	while (!Q.empty()) {		/* while queue still has sites  */
 		
 		s1 = Q.front();
-	       	Q.pop();
+	    Q.pop();
 		RemS.push(s1);		/* put the site on the removed stack */
 		Avalanche[s1] = a_label;	/* label the site with its culling cluster */
 		L->setActiveLevel(s1,0);
@@ -272,8 +272,7 @@ int cullSitesII(Lattice *L, queue< size_t > &Q, size_t m_val,
       
 		/* Now check all neighbor sites of the recently culled site and send them to the
 		   culling queue if they don't meet the culling condition.                         */
-		for (size_t j = 0; j < L->getNumNeighbors(s1); j++) { 
-			s2 = L->getNbr(s1,j);
+	    for(size_t s2 : L->getNbrs(s1)) {
 			if ( L->isActive(s2) && L->getNumActiveNeighbors(s2) < m_val ) {
 				Q.push(s2);
 				L->setActiveLevel(s2,0);

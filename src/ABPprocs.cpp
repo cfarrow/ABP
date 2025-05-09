@@ -59,7 +59,7 @@ size_t cullSites(Lattice *L, queue< size_t > &Q, size_t cull) {
 
       /* Now check all neighbor sites of the recently culled site and send them to the
          culling queue if they don't meet the culling condition.                         */
-	  for( auto s2 : L->getNbrs(s1)) {
+	  for(size_t s2 : L->getNbrs(s1)) {
 		 if ( L->isActive(s2) && L->getNumActiveNeighbors(s2) < cull) {
 			 Q.push(s2);
 			 L->setActiveLevel(s2,0);

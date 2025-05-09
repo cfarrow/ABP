@@ -39,9 +39,11 @@ class LatticeRandom: public Lattice
            else return false;
         }
         
-        Neighbors getNbrs(size_t i) { 
-            return Neighbors(neighbor[i], getNumNeighbors(i)); 
+        Neighbors getNbrs(size_t i, bool safe) { 
+            return Neighbors(neighbor[i], getNumNeighbors(i), safe);
         }
+        // The neighbors array does not change, so default to not safe
+        Neighbors getNbrs(size_t i) { return getNbrs(i, false); }
         virtual size_t getNbr(size_t i, size_t j) { return neighbor[i][j]; }
         virtual size_t getNumActiveNeighbors(size_t i);
         virtual bool isSpanning(size_t = 1){ return isGiant();}

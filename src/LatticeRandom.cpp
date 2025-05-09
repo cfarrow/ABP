@@ -3,7 +3,7 @@
 
 size_t LatticeRandom::getNumActiveNeighbors(size_t i) {
     size_t count = 0;
-	for(size_t j : getNbrs(i))
+	for(size_t j : getNbrs(i, false))
     {
         if( isActive( j ) ) count++;
     }
@@ -53,7 +53,7 @@ void LatticeRandom::labelClusters(size_t a) {
 			s1 = CQ.front();
 			CQ.pop();
 
-			for(size_t s2 : getNbrs(s1)) {
+			for(size_t s2 : getNbrs(s1, false)) {
 				if( isActive(s2) == a && cluster_label[s2] == num_sites ) {
 									 
 					/* label this site and count its mass */

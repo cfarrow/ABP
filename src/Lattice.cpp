@@ -195,7 +195,7 @@ void Lattice::labelClusters(size_t a) {
 			   two sites is length-1, then they must be in in the top and 
 			   bottom planes, respectivley.
 			 */
-			for(size_t s2 : getNbrs(s1)) {
+			for(size_t s2 : getNbrs(s1, false)) {
 				if( isActive(s2) == a && cluster_label[s2] == num_sites && 
 					(size_t) abs(static_cast<int>(s1%length) - static_cast<int>(s2%length)) != length-1 ) {
 									 

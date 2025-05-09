@@ -1,4 +1,5 @@
 #include "LatticeRegular.h"
+#include "Neighbors.h"
 
 /* For regular graphs, the convention is to create an array of neighbors of site
  * i with this function. It then is called whenever a neighbor is needed. This
@@ -19,7 +20,7 @@ size_t LatticeRegular::getNbr(size_t i, size_t j)
 }
 
 
-Neighbors LatticeRegular::getNbrs(size_t i)
+Neighbors LatticeRegular::getNbrs(size_t i, bool safe)
 {
     size_t nn;
     if( last != i ) {
@@ -31,7 +32,7 @@ Neighbors LatticeRegular::getNbrs(size_t i)
         nn = getNumNeighbors(i);
     }
 
-    return Neighbors(nbrs, nn);
+    return Neighbors(nbrs, nn, safe);
 }
 
 

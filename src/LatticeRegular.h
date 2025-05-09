@@ -25,8 +25,9 @@ class LatticeRegular: public Lattice
             delete[] nbrs;
         }
 
-        /* Get an object that iterates over neighbors of a given site. */
-        Neighbors getNbrs(size_t);
+        Neighbors getNbrs(size_t, bool safe);
+        // Default to safe since nbrs can change during iteration
+        Neighbors getNbrs(size_t i) { return getNbrs(i, true); }
         
         /* virtual functions */
         virtual void activateSites() {
@@ -39,8 +40,8 @@ class LatticeRegular: public Lattice
 
     protected:
          size_t num_neighbors;
-         size_t last;
-         size_t* nbrs;
+         size_t last;  // indicates the site corresponding to nbrs
+         size_t* nbrs; // storage for the neighbors corresponding to last
          virtual size_t setNbrs(size_t) = 0;
 };
 
