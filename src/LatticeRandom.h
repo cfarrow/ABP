@@ -26,8 +26,13 @@ class LatticeRandom: public Lattice
         virtual ~LatticeRandom() {}
         
 
-        // These functions are specific to this class
-        virtual void generateBonds();
+        /* The bond scheme for random, or more appropriately, non-regular graphs
+         * is to have a neighbor table. This is memory inefficient, since each
+         * bond exists twice in the table, e.g., i is a neighbor of j, which is
+         * a neighbor of i.  This scheme does not work for removing bonds.  It
+         * only works for site-percolation.
+         */
+        virtual void generateBonds() = 0;
         virtual bool isGiant() {
            /* Cluster is giant if it has > 10% of the sites */
            if( getMaxMass() > num_sites/10 ) return true;

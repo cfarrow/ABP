@@ -10,15 +10,6 @@ size_t LatticeRandom::getNumActiveNeighbors(size_t i) {
     return count;
 }
 
-/* The bond scheme for random, or more appropriately, non-regular graphs is to
- * have a neighbor table. This is memory inefficient, since each bond exists
- * twice in the table, e.g., i is a neighbor of j, which is a neighbor of i.
- * However, it is fast and simple This scheme does not work for removing bonds.
- * It only works for site-percolation.
- */
-void LatticeRandom::generateBonds() {
-    //IMPLEMENT IN DERIVED CLASS
-}
 
 void LatticeRandom::labelClusters(size_t a) {
 
