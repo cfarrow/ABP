@@ -41,9 +41,9 @@ class Neighbors {
         auto end() {return begin() + n;}
 
     private:
-        size_t* nbrs;
-        bool dealloc;
         size_t n;
+        bool dealloc;
+        size_t* nbrs;
 };
 
 
