@@ -12,13 +12,22 @@ accounted for during iteration.
 class Neighbors {
 
     public:
-        Neighbors(const size_t* arr, const size_t& size) : nbrs(arr), n(size) {}
+        Neighbors(const size_t* arr, const size_t& size) : n(size) {
+            // We have to make a copy because other functions can change the
+            // array while we're iterating.
+            nbrs = new size_t [n];
+            std::copy(arr, arr + n, nbrs);
+        }
+
+        ~Neighbors(){
+            delete [] nbrs;
+        }
 
         auto begin() {return &nbrs[0];}
         auto end() {return begin() + n;}
 
     private:
-        const size_t* nbrs;
+        size_t* nbrs;
         const size_t n;
 };
 
