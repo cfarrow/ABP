@@ -76,7 +76,7 @@ class Lattice
           size_t getClusterLabel(size_t i) {return cluster_label[i]; }
           /* get size of cluster, as referenced by its label */
           size_t getClusterSize(size_t i) {return Clusters[i]; }
-
+          size_t getNumActiveNeighbors(size_t);
 
           /* ---------------------------------------------------------------*\
           Check to see if the largest cluster is a spanning cluster.
@@ -89,7 +89,6 @@ class Lattice
           /* virtual function - see notes below */
           virtual size_t getNumNeighbors(size_t) = 0; 
           virtual size_t getNbr(size_t, size_t) = 0;
-          virtual size_t getNumActiveNeighbors(size_t) = 0;
           virtual Neighbors getNbrs(size_t, bool) = 0;
           virtual Neighbors getNbrs(size_t) = 0;
 

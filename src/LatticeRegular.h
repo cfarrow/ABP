@@ -36,7 +36,6 @@ class LatticeRegular: public Lattice
         }
         virtual size_t getNumNeighbors(size_t) = 0; 
         virtual size_t getNbr(size_t, size_t);
-        virtual size_t getNumActiveNeighbors(size_t);
 
     protected:
          size_t num_neighbors;

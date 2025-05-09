@@ -34,23 +34,3 @@ Neighbors LatticeRegular::getNbrs(size_t i, bool safe)
 
     return Neighbors(nbrs, nn, safe);
 }
-
-
-size_t LatticeRegular::getNumActiveNeighbors(size_t i) 
-{
-
-    size_t count = 0;
-
-	if( last != i ) {
-        setNbrs(i);
-        last = i;
-    }
-
-    for( size_t j = 0; j < getNumNeighbors(i); j++ ) {
-        if( isActive( nbrs[j] ) ) {
-            count++;
-        }
-    }
-
-    return count;
-}

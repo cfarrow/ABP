@@ -1,15 +1,6 @@
 #include "LatticeRandom.h"
 #include <queue>
 
-size_t LatticeRandom::getNumActiveNeighbors(size_t i) {
-    size_t count = 0;
-	for(size_t j : getNbrs(i, false))
-    {
-        if( isActive( j ) ) count++;
-    }
-    return count;
-}
-
 
 void LatticeRandom::labelClusters(size_t a) {
 

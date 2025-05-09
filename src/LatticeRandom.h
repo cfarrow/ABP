@@ -45,7 +45,6 @@ class LatticeRandom: public Lattice
         // The neighbors array does not change, so default to not safe
         Neighbors getNbrs(size_t i) { return getNbrs(i, false); }
         virtual size_t getNbr(size_t i, size_t j) { return neighbor[i][j]; }
-        virtual size_t getNumActiveNeighbors(size_t i);
         virtual bool isSpanning(size_t = 1){ return isGiant();}
         virtual void labelClusters(size_t = 1);
 

@@ -135,6 +135,17 @@ void Lattice::activateSites(void) {
 	num_present_sites = num_sites;
 }
 
+
+size_t Lattice::getNumActiveNeighbors(size_t i) {
+    size_t count{0};
+	for(size_t j : getNbrs(i, false))
+    {
+        if( isActive( j ) ) count++;
+    }
+    return count;
+}
+
+
 /* ---------------------------------------------------------------*\
 
    Find the clusters in the lattice and label the sites
