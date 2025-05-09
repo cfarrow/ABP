@@ -135,7 +135,7 @@ void CubRand::generateBonds() {
     for(size_t loop = 0; loop < 2; loop++)
     {
         bonds_to_choose = nb;
-        for(int l=0; l < nb/2; ++l)
+        for(size_t l=0; l < nb/2; ++l)
         {
 
             bidx1 = rng(0, bonds_to_choose);
