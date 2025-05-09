@@ -10,7 +10,7 @@ size_t Cubic4d<4>::getNumNeighbors(size_t) {
 
 
 template<>
-void Cubic4d<4>::setNbrs(size_t i) 
+size_t Cubic4d<4>::setNbrs(size_t i) 
 {
     Point4d p{i, length};
     nbrs[0] = p.shift(-1,  0,  0,  0);
@@ -21,6 +21,7 @@ void Cubic4d<4>::setNbrs(size_t i)
     nbrs[5] = p.shift( 0,  0,  1,  0);
     nbrs[6] = p.shift( 0,  0,  0, -1);
     nbrs[7] = p.shift( 0,  0,  0,  1);
+    return 8;
 }
 
 
@@ -38,7 +39,7 @@ size_t Cubic4d<3>::getNumNeighbors(size_t i) {
 
 
 template<>
-void Cubic4d<3>::setNbrs(size_t i) 
+size_t Cubic4d<3>::setNbrs(size_t i) 
 {
     Point4d p{i, length};
     size_t n{0};
@@ -50,6 +51,7 @@ void Cubic4d<3>::setNbrs(size_t i)
     nbrs[n++] = p.shift( 0,  0,  1,  0);
     nbrs[n++] = p.shift( 0,  0,  0, -1);
     nbrs[n++] = p.shift( 0,  0,  0,  1);
+    return n;
 }
 
 
@@ -68,7 +70,7 @@ size_t Cubic4d<2>::getNumNeighbors(size_t i) {
 
 
 template<>
-void Cubic4d<2>::setNbrs(size_t i) 
+size_t Cubic4d<2>::setNbrs(size_t i) 
 {
     Point4d p{i, length};
     size_t n{0};
@@ -80,6 +82,7 @@ void Cubic4d<2>::setNbrs(size_t i)
     nbrs[n++] = p.shift( 0,  0,  1,  0);
     nbrs[n++] = p.shift( 0,  0,  0, -1);
     nbrs[n++] = p.shift( 0,  0,  0,  1);
+    return n;
 }
 
 /* PBC in one directions: 
@@ -97,7 +100,7 @@ size_t Cubic4d<1>::getNumNeighbors(size_t i) {
 }
 
 template<>
-void Cubic4d<1>::setNbrs(size_t i) 
+size_t Cubic4d<1>::setNbrs(size_t i) 
 {
     Point4d p{i, length};
     size_t n{0};
@@ -109,6 +112,7 @@ void Cubic4d<1>::setNbrs(size_t i)
     if(p.y != b)    nbrs[n++] = p.shift( 0,  0,  1,  0);
     nbrs[n++] = p.shift( 0,  0,  0, -1);
     nbrs[n++] = p.shift( 0,  0,  0,  1);
+    return n;
 }
 
 
@@ -129,7 +133,7 @@ size_t Cubic4d<0>::getNumNeighbors(size_t i) {
 
 
 template<>
-void Cubic4d<0>::setNbrs(size_t i) 
+size_t Cubic4d<0>::setNbrs(size_t i) 
 {
     Point4d p{i, length};
     size_t n{0};
@@ -141,6 +145,7 @@ void Cubic4d<0>::setNbrs(size_t i)
     if(p.y != b)    nbrs[n++] = p.shift( 0,  0,  1,  0);
     if(p.z != 0)    nbrs[n++] = p.shift( 0,  0,  0, -1);
     if(p.z != b)    nbrs[n++] = p.shift( 0,  0,  0,  1);
+    return n;
 }
 
 

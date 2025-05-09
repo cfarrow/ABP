@@ -22,7 +22,7 @@ size_t Hexagonal<2>::getNumNeighbors(size_t) {
 
 
 template<>
-void Hexagonal<2>::setNbrs(size_t i) 
+size_t Hexagonal<2>::setNbrs(size_t i) 
 {
     /* Get the coordinates of the lattice site */
     Point2d p{i, length};
@@ -30,6 +30,7 @@ void Hexagonal<2>::setNbrs(size_t i)
     nbrs[0] = p.shift(0, -1);
     nbrs[1] = p.shift(0,  1);
     nbrs[2] = p.shift(left ? -1 : 1, 0);
+    return 3;
 }
 
 
@@ -38,8 +39,8 @@ void Hexagonal<2>::setNbrs(size_t i)
 template<>
 size_t Hexagonal<1>::getNumNeighbors(size_t i) {
     Point2d p{i, length};
+    size_t nn{3};
     bool left = (p.x + p.y) % 2;
-    size_t nn = 3;
     if( left && p.x == 0)   nn -= 1;
     if(!left && p.x == b)   nn -= 1;
     return nn;
@@ -47,7 +48,7 @@ size_t Hexagonal<1>::getNumNeighbors(size_t i) {
 
 
 template<>
-void Hexagonal<1>::setNbrs(size_t i) 
+size_t Hexagonal<1>::setNbrs(size_t i) 
 {
     Point2d p{i, length};
     bool left = (p.x + p.y) % 2;
@@ -57,6 +58,7 @@ void Hexagonal<1>::setNbrs(size_t i)
     nbrs[n++] = p.shift( 0,  1);
     if( left && p.x != 0)   nbrs[n++] = p.shift(-1, 0);
     if(!left && p.x != b)   nbrs[n++] = p.shift( 1, 0);
+    return n;
 }
 
 
@@ -65,8 +67,8 @@ void Hexagonal<1>::setNbrs(size_t i)
 template<>
 size_t Hexagonal<0>::getNumNeighbors(size_t i) {
     Point2d p{i, length};
+    size_t nn{3};
     bool left = (p.x + p.y) % 2;
-    size_t nn = 3;
     if( left && p.x == 0)       nn -= 1;
     if(!left && p.x == b)       nn -= 1;
     if(p.y == 0 || p.y == b)    nn -= 1;
@@ -75,7 +77,7 @@ size_t Hexagonal<0>::getNumNeighbors(size_t i) {
 
 
 template<>
-void Hexagonal<0>::setNbrs(size_t i) 
+size_t Hexagonal<0>::setNbrs(size_t i) 
 {
     Point2d p{i, length};
     size_t n{0};
@@ -85,6 +87,7 @@ void Hexagonal<0>::setNbrs(size_t i)
     if(p.y != b)            nbrs[n++] = p.shift( 0,  1);
     if( left && p.x != 0)   nbrs[n++] = p.shift(-1,  0);
     if(!left && p.x != b)   nbrs[n++] = p.shift( 1,  0);
+    return n;
 }
 
 

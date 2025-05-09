@@ -11,7 +11,7 @@ size_t Triangular<2>::getNumNeighbors(size_t) {
 
 
 template<>
-void Triangular<2>::setNbrs(size_t i) 
+size_t Triangular<2>::setNbrs(size_t i) 
 {
     Point2d p{i, length};
     nbrs[0] = p.shift( 1,  0);
@@ -20,6 +20,7 @@ void Triangular<2>::setNbrs(size_t i)
     nbrs[3] = p.shift( 0, -1);
     nbrs[4] = p.shift(-1,  1);
     nbrs[5] = p.shift( 1, -1);
+    return 6;
 }
 
 
@@ -39,7 +40,7 @@ size_t Triangular<1>::getNumNeighbors(size_t i) {
 
 
 template<>
-void Triangular<1>::setNbrs(size_t i) 
+size_t Triangular<1>::setNbrs(size_t i) 
 {
     Point2d p{i, length};
     size_t n{0};
@@ -53,6 +54,7 @@ void Triangular<1>::setNbrs(size_t i)
         nbrs[n++] = p.shift( 1,  0);
         nbrs[n++] = p.shift( 1, -1);
     }
+    return n;
 }
 
 
@@ -77,7 +79,7 @@ size_t Triangular<0>::getNumNeighbors(size_t i) {
 
 
 template<>
-void Triangular<0>::setNbrs(size_t i) 
+size_t Triangular<0>::setNbrs(size_t i) 
 {
     Point2d p{i, length};
     size_t n{0};
@@ -92,6 +94,7 @@ void Triangular<0>::setNbrs(size_t i)
     if(!top)                nbrs[n++] = p.shift( 0,  1);
     if(!left && !top)       nbrs[n++] = p.shift(-1,  1);
     if(!right && !botm)     nbrs[n++] = p.shift( 1, -1);
+    return n;
 }
 
 

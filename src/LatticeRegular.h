@@ -1,9 +1,6 @@
 /* LatticeRegular.h
  * This class is meant to be a superclass for all regular graphs.  It's neighbor
- * retrieval scheme does not work with random graphs.  A proper subclass will
- * only need to define the setNbrs() function.  This means that there is no need
- * for a cpp file.  The derived class may require additional items in the
- * constructor.  See Triangular.h for an example.
+ * retrieval scheme does not work with random graphs.
  *
  * 03/14/07 Created this as a super-class for regular lattices.
 */
@@ -28,6 +25,7 @@ class LatticeRegular: public Lattice
             delete[] nbrs;
         }
 
+        /* Get an object that iterates over neighbors of a given site. */
         Neighbors getNbrs(size_t);
         
         /* virtual functions */
@@ -43,7 +41,7 @@ class LatticeRegular: public Lattice
          size_t num_neighbors;
          size_t last;
          size_t* nbrs;
-         virtual void setNbrs(size_t) {};
+         virtual size_t setNbrs(size_t) = 0;
 };
 
 #endif

@@ -10,7 +10,7 @@ size_t Cubic<3>::getNumNeighbors(size_t) {
 
 
 template <>
-void Cubic<3>::setNbrs(size_t i) 
+size_t Cubic<3>::setNbrs(size_t i) 
 {
     Point3d p{i, length};
     nbrs[0] = p.shift(-1,  0,  0);
@@ -19,6 +19,7 @@ void Cubic<3>::setNbrs(size_t i)
     nbrs[3] = p.shift( 0,  1,  0);
     nbrs[4] = p.shift( 0,  0, -1);
     nbrs[5] = p.shift( 0,  0,  1);
+    return 6;
 }
 
 
@@ -37,7 +38,7 @@ size_t Cubic<2>::getNumNeighbors(size_t i) {
 
 
 template <>
-void Cubic<2>::setNbrs(size_t i) 
+size_t Cubic<2>::setNbrs(size_t i) 
 {
     /* Get the coordinates of the lattice site */
     Point3d p{i, length};
@@ -48,6 +49,7 @@ void Cubic<2>::setNbrs(size_t i)
     nbrs[n++] = p.shift( 0,  1,  0);
     nbrs[n++] = p.shift( 0,  0, -1);
     nbrs[n++] = p.shift( 0,  0,  1);
+    return n;
 }
 
 
@@ -69,7 +71,7 @@ size_t Cubic<1>::getNumNeighbors(size_t i) {
 
 
 template <>
-void Cubic<1>::setNbrs(size_t i) 
+size_t Cubic<1>::setNbrs(size_t i) 
 {
     Point3d p{i, length};
     size_t n{0};
@@ -79,6 +81,7 @@ void Cubic<1>::setNbrs(size_t i)
     if(p.y != b) nbrs[n++] = p.shift( 0,  1,  0);
     nbrs[n++] = p.shift( 0,  0, -1);
     nbrs[n++] = p.shift( 0,  0,  1);
+    return n;
 }
 
 
@@ -100,7 +103,7 @@ size_t Cubic<0>::getNumNeighbors(size_t i) {
 
 
 template <>
-void Cubic<0>::setNbrs(size_t i) 
+size_t Cubic<0>::setNbrs(size_t i) 
 {
     /* Get the coordinates of the lattice site */
     Point3d p{i, length};
@@ -111,6 +114,7 @@ void Cubic<0>::setNbrs(size_t i)
     if(p.y != b) nbrs[n++] = p.shift( 0,  1,  0);
     if(p.z != 0) nbrs[n++] = p.shift( 0,  0, -1);
     if(p.z != b) nbrs[n++] = p.shift( 0,  0,  1);
+    return n;
 }
 
 

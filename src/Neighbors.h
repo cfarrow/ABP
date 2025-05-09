@@ -1,7 +1,6 @@
 #ifndef NEIGHBORS_H
 #define NEIGHBORS_H
 
-
 /* Helper class to simplify iteration over neighbors. 
 
 Neighbor arrays used in LatticeRegular and LatticeRegular may over-allocate

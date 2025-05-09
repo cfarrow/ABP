@@ -21,12 +21,17 @@ size_t LatticeRegular::getNbr(size_t i, size_t j)
 
 Neighbors LatticeRegular::getNbrs(size_t i)
 {
+    size_t nn;
     if( last != i ) {
-        setNbrs(i);
+        // Save a call to getNumNeighbors
+        nn = setNbrs(i);
         last = i;
+    } 
+    else {
+        nn = getNumNeighbors(i);
     }
 
-    return Neighbors(nbrs, getNumNeighbors(i));
+    return Neighbors(nbrs, nn);
 }
 
 

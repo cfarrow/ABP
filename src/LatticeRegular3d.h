@@ -1,10 +1,6 @@
 /* LatticeRegular3d.h
- * This class is meant to be a superclass for 3D regular graphs.
- * It's neighbor retrieval scheme does not work with random graphs.
- * A proper subclass will only need to define the setNbrs() function,
- * which is inline. This means that there is no need for a cpp file.
- * The derived class may require additional items in the constructor.
- * See Cubic.h for an example.
+ * This class is meant to be a superclass for 3D regular graphs.  It's neighbor
+ * retrieval scheme does not work with random graphs.
  *
  * 08/01/05 Created this as a subclass of Lattice.
 */

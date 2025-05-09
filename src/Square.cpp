@@ -11,12 +11,13 @@ size_t Square<2>::getNumNeighbors(size_t) {
 
 
 template<>
-void Square<2>::setNbrs(size_t i) {
+size_t Square<2>::setNbrs(size_t i) {
     Point2d p{i, length};
     nbrs[1] = p.shift(-1,  0);
     nbrs[0] = p.shift( 1,  0);
     nbrs[3] = p.shift( 0, -1);
     nbrs[2] = p.shift( 0,  1);
+    return 4;
 }
 
 /* PBC in one direction:
@@ -33,7 +34,7 @@ size_t Square<1>::getNumNeighbors(size_t i) {
 
 
 template<>
-void Square<1>::setNbrs(size_t i) {
+size_t Square<1>::setNbrs(size_t i) {
     /* Get the coordinates of the lattice site */
     Point2d p{i, length};
     size_t n{0};
@@ -42,6 +43,7 @@ void Square<1>::setNbrs(size_t i) {
     if(p.x != b) nbrs[n++] = p.shift( 1,  0);
     nbrs[n++] = p.shift( 0,  1);
     nbrs[n++] = p.shift( 0, -1);
+    return n;
 }
 
 /* PBC in no directions:
@@ -63,7 +65,7 @@ size_t Square<0>::getNumNeighbors(size_t i) {
 
 
 template<>
-void Square<0>::setNbrs(size_t i) {
+size_t Square<0>::setNbrs(size_t i) {
     Point2d p{i, length};
     size_t n{0};
 
@@ -71,6 +73,7 @@ void Square<0>::setNbrs(size_t i) {
     if(p.x != b) nbrs[n++] = p.shift( 1,  0);
     if(p.y != 0) nbrs[n++] = p.shift( 0, -1);
     if(p.y != b) nbrs[n++] = p.shift( 0, -1);
+    return n;
 }
 
 

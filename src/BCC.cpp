@@ -56,7 +56,7 @@ size_t BCC<3>::getNumNeighbors(size_t) {
 
 
 template <>
-void BCC<3>::setNbrs(size_t i) 
+size_t BCC<3>::setNbrs(size_t i) 
 {
     Point3d p{i, length};
     bool is_A = p.z % 2 == 0;
@@ -69,6 +69,7 @@ void BCC<3>::setNbrs(size_t i)
         nbrs[2*j]     = p.shift(sx, sy,  1);
         nbrs[2*j + 1] = p.shift(sx, sy, -1);
     }
+    return 8;
 }
 
 // PBC in X and Y directions. The lattice has a face.
@@ -86,7 +87,7 @@ size_t BCC<2>::getNumNeighbors(size_t i) {
 
 
 template <>
-void BCC<2>::setNbrs(size_t i) 
+size_t BCC<2>::setNbrs(size_t i) 
 {
     Point3d p{i, length};
     size_t n{0};
@@ -104,6 +105,7 @@ void BCC<2>::setNbrs(size_t i)
         if(!botm_face)  nbrs[n++] = p.shift(sx, sy, -1);
         if(!top_face)   nbrs[n++] = p.shift(sx, sy,  1);
     }
+    return n;
 }
 
 
@@ -135,7 +137,7 @@ size_t BCC<1>::getNumNeighbors(size_t i) {
 
 
 template<>
-void BCC<1>::setNbrs(size_t i) 
+size_t BCC<1>::setNbrs(size_t i) 
 {
     Point3d p{i, length};
     size_t n{0};
@@ -160,6 +162,7 @@ void BCC<1>::setNbrs(size_t i)
         if(!top_face && !(back_face && sy == 1))
             nbrs[n++] = p.shift(sx, sy, 1);
     }
+    return n;
 }
 
 
@@ -199,7 +202,7 @@ size_t BCC<0>::getNumNeighbors(size_t i) {
 
 
 template<>
-void BCC<0>::setNbrs(size_t i) 
+size_t BCC<0>::setNbrs(size_t i) 
 {
     Point3d p{i, length};
     size_t n{0};
@@ -227,6 +230,7 @@ void BCC<0>::setNbrs(size_t i)
         if(!top_face && !(back_face && sy == 1) && !(right_face && sx == 1))
             nbrs[n++] = p.shift(sx, sy, 1);
     }
+    return n;
 }
 
 

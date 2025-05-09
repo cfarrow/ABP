@@ -16,6 +16,6 @@ class Cubic: public LatticeRegular3d
         virtual size_t getNumNeighbors(size_t);
 
     protected:
-        virtual void setNbrs(size_t);
+        virtual size_t setNbrs(size_t);
 };
 #endif

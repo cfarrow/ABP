@@ -9,7 +9,7 @@ size_t UJack<2>::getNumNeighbors(size_t) {
 
 
 template<>
-void UJack<2>::setNbrs(size_t i) 
+size_t UJack<2>::setNbrs(size_t i) 
 {
     Point2d p{i, length};
     nbrs[0] = p.shift(-1,  0);
@@ -20,6 +20,7 @@ void UJack<2>::setNbrs(size_t i)
     nbrs[5] = p.shift( 1, -1);
     nbrs[6] = p.shift( 1,  1);
     nbrs[7] = p.shift(-1, -1);
+    return 8;
 }
 
 
@@ -36,7 +37,7 @@ size_t UJack<1>::getNumNeighbors(size_t i) {
 
 
 template<>
-void UJack<1>::setNbrs(size_t i) 
+size_t UJack<1>::setNbrs(size_t i) 
 {
     Point2d p{i, length};
     size_t n{0};
@@ -53,6 +54,7 @@ void UJack<1>::setNbrs(size_t i)
     }
     nbrs[n++] = p.shift( 0, -1);
     nbrs[n++] = p.shift( 0,  1);
+    return n;
 }
 
 
@@ -78,7 +80,7 @@ size_t UJack<0>::getNumNeighbors(size_t i) {
 
 
 template<>
-void UJack<0>::setNbrs(size_t i) 
+size_t UJack<0>::setNbrs(size_t i) 
 {
     Point2d p{i, length};
     size_t n{0};
@@ -90,6 +92,7 @@ void UJack<0>::setNbrs(size_t i)
     if(p.x != b && p.x != 0)    nbrs[n++] = p.shift( 1, -1);
     if(p.x != b && p.y != b)    nbrs[n++] = p.shift( 1,  1);
     if(p.x != 0 && p.y != 0)    nbrs[n++] = p.shift(-1, -1);
+    return n;
 }
 
 
