@@ -9,14 +9,14 @@ cdef extern from "LatticeRegular2d.cpp":
 
 cdef extern from "LatticeRegular.cpp":
     pass
-
+    
 cdef extern from "Lattice.cpp":
     pass
 
 
-cdef extern from "Triangular.h":
-    cdef cppclass Triangular:
-        Triangular(size_t len_, size_t id_, short pbc) except +
+cdef extern from "Lattice.h":
+    cdef cppclass Lattice:
+        Lattice(size_t len_, size_t id_) except +
         size_t getLength()
         size_t getNumSites()
         size_t getNumActive()
@@ -35,3 +35,8 @@ cdef extern from "Triangular.h":
         size_t getNumNeighbors(size_t) 
         size_t getNbr(size_t, size_t)
         size_t getNumActiveNeighbors(size_t)
+
+
+cdef extern from "Triangular.h":
+    cdef cppclass Triangular[T](Lattice):
+        Triangular(size_t len_, size_t id_) except +

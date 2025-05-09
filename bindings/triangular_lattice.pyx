@@ -1,12 +1,27 @@
 # distutils: language = c++
 
-from Triangular cimport Triangular
+from Triangular cimport Lattice, Triangular
+
+
+# cname hack for non-type templates.
+# see https://stackoverflow.com/questions/53582945/wrapping-c-code-with-function-pointer-as-template-parameter-in-cython
+cdef extern from *:
+    ctypedef size_t T2 "2"
+    ctypedef size_t T1 "1"
+    ctypedef size_t T0 "0"
+
 
 cdef class TriangularLattice:
-    cdef Triangular* _p;
 
-    def __cinit__(self, size_t len_, size_t id_=0, short pbc=2):
-        self._p = new Triangular(len_, id_, pbc)
+    cdef Lattice *_p
+
+    def __cinit__(self, size_t len_, unsigned short pbc=2):
+        if pbc == 0:
+            self._p = new Triangular[T0](len_, 0)
+        elif pbc == 1:
+            self._p = new Triangular[T1](len_, 0)
+        else:
+            self._p = new Triangular[T2](len_, 0)
 
     def __dealloc__(self):
         del self._p
