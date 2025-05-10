@@ -1,6 +1,6 @@
 # distutils: language = c++
 
-from Triangular cimport Lattice, Triangular
+from Lattice cimport Lattice, Triangular
 
 
 # cname hack for non-type templates.

@@ -84,6 +84,9 @@ cover/
 # Cython debug symbols
 cython_debug/
 
+# Cython-generated cpp files
+bindings/*.cpp
+
 # uv
 uv.lock
 
