@@ -16,7 +16,8 @@
 class CubRand: public LatticeRandom
 {
     public:
-        CubRand(size_t len, size_t id = 0, double fb = 0) : LatticeRandom( len*len*len, id )
+        CubRand(size_t len, size_t id = 0, double fb = 0) 
+        : LatticeRandom( len*len*len, id )
         {
             Setup(fb);
             generateBonds();
@@ -35,6 +36,7 @@ class CubRand: public LatticeRandom
         }
 
     private:
+        size_t dims{3};
         double f;
         size_t nb; // # of bonds to be swapped out
         int *bondlist;

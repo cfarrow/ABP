@@ -13,7 +13,8 @@
 class SquRand: public LatticeRandom
 {
     public:
-         SquRand(size_t len, size_t id = 0, double fb = 0) : LatticeRandom( len*len, id )
+         SquRand(size_t len, size_t id = 0, double fb = 0) 
+         : LatticeRandom( len*len, id )
          {
              Setup(fb);
              generateBonds();
@@ -32,6 +33,7 @@ class SquRand: public LatticeRandom
          }
 
     private:
+         size_t dims{2};
          double f;
          size_t nb; // # of bonds to be swapped out
          int *bondlist;

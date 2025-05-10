@@ -24,6 +24,7 @@ class LatticeRegular4d: public LatticeRegular
         virtual bool isSpanning(size_t = 1);
 
     protected:
+        size_t dims{4};
         size_t b; // The boundary of any dimension of the lattice
 };
 #endif

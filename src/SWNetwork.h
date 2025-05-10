@@ -44,7 +44,6 @@ class SWNetwork: public LatticeRandom
         virtual size_t getNumNeighbors(size_t);
 
     private:
-        size_t dim;
         double alpha, gamma;
 
         size_t *coordination;

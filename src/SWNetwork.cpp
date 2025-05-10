@@ -7,18 +7,18 @@
 
 // TODO
 
-void SWNetwork::Setup(size_t _dim, double _alpha, double _gamma)
+void SWNetwork::Setup(size_t _dims, double _alpha, double _gamma)
 {
     // constants
     max_neighbors = 50;
     SHORT_BOND_LENGTH = 2.3;
 
-    dim = _dim;
+    dims = _dims;
     alpha = _alpha;
     gamma = _gamma;
 
     // This will not have roundoff error. See the constructor for details.
-    length = static_cast<size_t>(pow(num_sites, 1.0/dim) );
+    length = static_cast<size_t>(pow(num_sites, 1.0/dims) );
 
     /* This snippet of code makes the neighbor double array
      * sequential in memory. This speeds things up a bit.
@@ -56,13 +56,13 @@ void SWNetwork::Setup(size_t _dim, double _alpha, double _gamma)
 
     /* Calculate "coordinate jumps" for labelling of regular d-dim. lattice with
      * helical BC */
-    jump = new size_t[dim];
+    jump = new size_t[dims];
     if ( jump == NULL ) {
         std::cerr << "Memory alocation error!" << std::endl;
         exit(1);
     }
     jump[0] = 1;
-    for(size_t dir=1; dir < dim; dir++){
+    for(size_t dir=1; dir < dims; dir++){
         jump[dir]=length*jump[dir-1];
     }
 
@@ -104,7 +104,7 @@ void SWNetwork::generateBonds() {
 
     // Separation of bonds into short and long ones.
     double bond_len, bond_mod;
-    std::vector<double> vctr_coord(dim+1,0.0);
+    std::vector<double> vctr_coord(dims+1,0.0);
 
     double total_weight,psum,rweight;
 
@@ -112,7 +112,7 @@ void SWNetwork::generateBonds() {
     // obtained via inversion method.  half_length appears because of
     // the distribution being finite.  Else, the integrals would not converge in
     // case of exponent being >= (-1).
-    double ddim = static_cast<double>(dim);
+    double ddim = static_cast<double>(dims);
     double dexponent = 1.0/(ddim - alpha);
     double lambda = pow((1.0*half_length + 1.0), ddim - alpha) - 1.0;
     
@@ -198,7 +198,7 @@ void SWNetwork::generateBonds() {
                     // 2) Generate random d-dimensional versor
                     do{
                         bond_mod = 0.0;
-                        for(dir=0;dir<(size_t)dim;dir++) {
+                        for(dir=0;dir<(size_t)dims;dir++) {
                             vctr_coord[dir]=2*prng()-1.0;
                             bond_mod += pow(vctr_coord[dir], 2.0);
                         }
@@ -207,13 +207,13 @@ void SWNetwork::generateBonds() {
                     bond_mod=sqrt(bond_mod);
                     
                     // Build vector with random dir and length equal to bond_mod
-                    for(dir=0;dir<dim;dir++){
+                    for(dir=0;dir<dims;dir++){
                         vctr_coord[dir]=bond_len*vctr_coord[dir]/bond_mod;
                     } 
                     // Find site closest to this point. Recalculate length.
                     bond_mod=0.0;
                     ksite=0;
-                    for(dir=0;dir<dim;dir++){
+                    for(dir=0;dir<dims;dir++){
                         ksite += static_cast<size_t>(nearbyintl(vctr_coord[dir])*jump[dir]);
                         bond_mod+=nearbyintl(vctr_coord[dir])*nearbyintl(vctr_coord[dir]);
                     } 
@@ -263,12 +263,12 @@ void SWNetwork::calculateBondWeights(void){
 
     // Calculate center_label
     center_label = 0;
-    for(dir=0; dir < dim ;dir++)
+    for(dir=0; dir < dims ;dir++)
     {
         center_label += half_length * jump[dir];
     }
 
-    std::vector<size_t> coordinate(dim,0);
+    std::vector<size_t> coordinate(dims,0);
 
     // Calculate bond weights bond_weight[], and short-bond weight p_s
     total_sweight = 0.0;
@@ -280,7 +280,7 @@ void SWNetwork::calculateBondWeights(void){
         new_label = (isite - center_label + num_sites) % num_sites;
         bond_len = 0.0;
         // calculate d cartesian coordinates
-        for(dir=0; dir < dim; dir++) {
+        for(dir=0; dir < dims; dir++) {
             coordinate[dir] = site_label % length;
             site_label /= length;
             bond_len += (coordinate[dir]-half_length)*(coordinate[dir]-half_length);
@@ -317,7 +317,7 @@ size_t SWNetwork::getNumNeighbors(size_t site) {
 }
 
 /* Note that the number of sites must be divisible by both the word_size
- * (defined in Lattice.h) and must be a power of length^dim.
+ * (defined in Lattice.h) and must be a power of length^dims.
  */
 size_t scaleLength(size_t nsites, size_t dim) {
     size_t length = static_cast<size_t>(pow(nsites, 1.0/dim) );
