@@ -14,5 +14,5 @@ classifiers = ["Private :: No Not Upload"]
 [tool.setuptools]
 package-dir = {"" = "."}
 ext-modules = [
-    {name = "ABPy.abp", sources = ["./bindings/abp.pyx"]},
+    {name = "ABPy.lattice", sources = ["./bindings/lattice.pyx"]},
 ]
