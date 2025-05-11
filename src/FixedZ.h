@@ -16,8 +16,7 @@
 class FixedZ: public LatticeRandom
 {
     public:
-         FixedZ(size_t len, size_t id = 0, size_t z = 6) 
-         : LatticeRandom( len, id )
+         FixedZ(size_t len, size_t id = 0, size_t z = 6) : LatticeRandom( len, id )
          {
              Setup(z);
              generateBonds();
@@ -34,7 +33,6 @@ class FixedZ: public LatticeRandom
          virtual size_t getNumNeighbors( size_t); 
 
     private:
-         size_t dims{2};
          void Setup(size_t z);
          void Cleanup();
          size_t *coordination;

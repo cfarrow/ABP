@@ -77,7 +77,6 @@ class Lattice
           /* get size of cluster, as referenced by its label */
           size_t getClusterSize(size_t i) {return Clusters[i]; }
           size_t getNumActiveNeighbors(size_t);
-          size_t getDims() {return dims;}
 
           /* ---------------------------------------------------------------*\
           Check to see if the largest cluster is a spanning cluster.
@@ -95,7 +94,6 @@ class Lattice
 
      protected: /* These are direcly callable/mutable by derived classes */
           size_t length;			/* length of lattice - if applicable */
-          size_t dims;             /* the dimensionality of the lattice */
           size_t graph_id;         /* number id of graph, could represent type */
           size_t num_sites;		/* number of sites	*/
           size_t num_words;
