@@ -62,9 +62,24 @@ cdef extern from "SWNetwork.cpp":
     pass
 
 
+cdef extern from "Point.h":
+    cdef cppclass Point2d:
+        Point2d(size_t index, size_t len_) except +
+        size_t x, y
+
+    cdef cppclass Point3d:
+        Point3d(size_t index, size_t len_) except +
+        size_t x, y, z
+
+    cdef cppclass Point4d:
+        Point4d(size_t index, size_t len_) except +
+        size_t w, x, y, z
+
+
 cdef extern from "Lattice.h":
     cdef cppclass Lattice:
         Lattice(size_t len_, size_t id_) except +
+        size_t getDims()
         size_t getLength()
         size_t getNumSites()
         size_t getNumActive()

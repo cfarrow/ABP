@@ -8,6 +8,7 @@ from Lattice cimport (
     FixedZ,                                 # Random coordinated
     SquRand, TriRand, CubRand,              # Random bonds
     SWNetwork,                              # Small world
+    Point2d, Point3d, Point4d,              # Helpers
 )
 
 
@@ -26,8 +27,9 @@ cdef class __LatticeMixin:
     
     This cannot be used directly. Classes derived from Lattice that are to be
     exposed to Python must derive from this class and provide a __cinit__ method
-    that creates and stores an instance of the lattice type. See
-    TriangularLattice for an example.
+    that creates and stores an instance of the lattice type. 
+
+    See TriangularLattice for an example.
     
     """
 
@@ -83,6 +85,32 @@ cdef class __LatticeMixin:
 
     def getNumActiveNeighbors(self, i):
         return self._p.getNumActiveNeighbors(i)
+
+    def getDims(self):
+        return self._p.getDims()
+
+    # These are to make the Python code easier to use
+
+    def getCoords(self, i):
+        """ Get the coordinates coresponding to a lattice point. 
+
+        Any lattice that is not 2, 3, or 4 dimensions is treated as
+        2-dimeinsional.
+        
+        """
+        dims = self._p.getDims()
+        if dims == 4:
+            p4 = new Point4d(i, self._p.getLength())
+            t = (p4.w, p4.x, p4.y, p4.z)
+            del p4
+        elif dims == 3:
+            p3 = new Point3d(i, self._p.getLength())
+            t = (p3.x, p3.y, p3.z)
+            del p3
+        else:
+            p2 = new Point2d(i, self._p.getLength())
+            t = (p2.x, p2.y)
+        return t
 
     def iter_nbrs(self, i):
         n = self._p.getNumNeighbors(i)
