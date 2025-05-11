@@ -1,6 +1,6 @@
 # distutils: language = c++
 
-import numpy as np
+cimport cython
 from cython.view cimport array as cvarray
 
 from Lattice cimport (
@@ -23,6 +23,46 @@ cdef extern from *:
     ctypedef size_t T2 "2"
     ctypedef size_t T1 "1"
     ctypedef size_t T0 "0"
+
+
+## Global stack variables
+cdef Point2d p2
+cdef Point3d p3
+cdef Point4d p4
+
+
+# Fast helper code
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef void populate_coords_4d(size_t length, size_t nsites, size_t[:, ::1] coords) noexcept nogil:
+    cdef int i
+    for i in range(nsites):
+        p4.update(i, length)
+        coords[i, 0] = p4.w
+        coords[i, 1] = p4.x
+        coords[i, 2] = p4.y
+        coords[i, 3] = p4.z
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef void populate_coords_3d(size_t length, size_t nsites, size_t[:, ::1] coords) noexcept nogil:
+    cdef int i
+    for i in range(nsites):
+        p3.update(i, length)
+        coords[i, 0] = p3.x
+        coords[i, 1] = p3.y
+        coords[i, 2] = p3.z
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef void populate_coords_2d(size_t length, size_t nsites, size_t[:, ::1] coords) noexcept nogil:
+    cdef int i
+    for i in range(nsites):
+        p2.update(i, length)
+        coords[i, 0] = p2.x
+        coords[i, 1] = p2.y
 
 
 cdef class __LatticeMixin:
@@ -98,20 +138,18 @@ cdef class __LatticeMixin:
         """ Get the coordinates coresponding to a lattice point. 
 
         Any lattice that is not 2, 3, or 4 dimensions is treated as
-        2-dimeinsional.
+        2-dimensional.
         
         """
         dims = self._p.getDims()
         if dims == 4:
-            p4 = new Point4d(i, self._p.getLength())
+            p4.update(i, self._p.getLength())
             t = (p4.w, p4.x, p4.y, p4.z)
-            del p4
         elif dims == 3:
-            p3 = new Point3d(i, self._p.getLength())
+            p3.update(i, self._p.getLength())
             t = (p3.x, p3.y, p3.z)
-            del p3
         else:
-            p2 = new Point2d(i, self._p.getLength())
+            p2.update(i, self._p.getLength())
             t = (p2.x, p2.y)
         return t
 
@@ -121,19 +159,30 @@ cdef class __LatticeMixin:
         The shape of the array is (number of sites, number of dimensions).
 
         """
-        cdef int i;
+        cdef size_t length = self._p.getLength()
         cdef size_t nsites = self._p.getNumSites()
         cdef size_t dims = self._p.getDims()
-        arr = np.empty((nsites, dims), dtype=np.uintp)
-        # This is not the fastest way to do this, but it is straighforward.
-        for i in range(nsites):
-            arr[i, :] = self.getCoords(i)
-        return arr
+        mem = cvarray(shape=(nsites, dims), itemsize=sizeof(size_t), format="L")
+        if dims == 4:
+            populate_coords_4d(length, nsites, mem)
+        elif dims == 3:
+            populate_coords_3d(length, nsites, mem)
+        else:
+            populate_coords_2d(length, nsites, mem)
+        return mem
 
     def iter_nbrs(self, i):
+        """ Iterate of the neighbors of site `i` """
         n = self._p.getNumNeighbors(i)
         for j in range(n):
             yield self._p.getNbr(i, j)
+
+    def iter_edges(self):
+        """ Iterate over all edges, removing symmetric dupicates. """
+        for i in self:
+            for j in self.iter_neighbors(i):
+                if i < j:
+                    yield (i, j)
 
     def __len__(self):
         return self._p.getNumSites()

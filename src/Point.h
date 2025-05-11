@@ -20,6 +20,10 @@ static inline int bounded(int v, int len)
 
 struct Point2d {
 
+    Point2d() {
+        update(0, 1);
+    }
+
     Point2d(size_t index, size_t len) {
         update(index, len);
     }
@@ -44,6 +48,10 @@ struct Point2d {
 
 
 struct Point3d {
+
+    Point3d() {
+        update(0, 1);
+    }
 
     Point3d(size_t index, size_t len) {
         update(index, len);
@@ -72,6 +80,10 @@ struct Point3d {
 
 
 struct Point4d {
+
+    Point4d() {
+        update(0, 1);
+    }
 
     Point4d(size_t index, size_t len) {
         update(index, len);

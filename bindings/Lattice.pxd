@@ -64,86 +64,89 @@ cdef extern from "SWNetwork.cpp":
 
 cdef extern from "Point.h":
     cdef cppclass Point2d:
-        Point2d(size_t index, size_t len_) except +
+        Point2d()
+        void update(size_t index, size_t len_) nogil
         size_t x, y
 
     cdef cppclass Point3d:
-        Point3d(size_t index, size_t len_) except +
+        Point3d()
+        void update(size_t index, size_t len_) nogil
         size_t x, y, z
 
     cdef cppclass Point4d:
-        Point4d(size_t index, size_t len_) except +
+        Point4d()
+        void update(size_t index, size_t len_) nogil
         size_t w, x, y, z
 
 
 cdef extern from "Lattice.h":
     cdef cppclass Lattice:
-        Lattice(size_t len_, size_t id_) except +
-        size_t getDims()
-        size_t getLength()
-        size_t getNumSites()
-        size_t getNumActive()
-        size_t getNumPresent()
-        size_t getNumClusters()
-        size_t getMaxMass()
+        Lattice(size_t len_, size_t id_)
+        size_t getDims() nogil
+        size_t getLength() nogil
+        size_t getNumSites() nogil
+        size_t getNumActive() nogil
+        size_t getNumPresent() nogil
+        size_t getNumClusters() nogil
+        size_t getMaxMass() nogil
 
         #/* Functions that act on single sites */
-        bint isActive(size_t)
-        bint isPresent(size_t)
-        void setActiveLevel(size_t, bint)
-        void setPresentLevel(size_t, bint)
-        size_t getClusterLabel(size_t i)
-        size_t getClusterSize(size_t i)
-        bint isSpanning(size_t)
-        size_t getNumNeighbors(size_t) 
-        size_t getNbr(size_t, size_t)
-        size_t getNumActiveNeighbors(size_t)
+        bint isActive(size_t) nogil
+        bint isPresent(size_t) nogil
+        void setActiveLevel(size_t, bint) nogil
+        void setPresentLevel(size_t, bint) nogil
+        size_t getClusterLabel(size_t i) nogil
+        size_t getClusterSize(size_t i) nogil
+        bint isSpanning(size_t) nogil
+        size_t getNumNeighbors(size_t)  nogil
+        size_t getNbr(size_t, size_t) nogil
+        size_t getNumActiveNeighbors(size_t) nogil
 
 
 cdef extern from "Hexagonal.h":
     cdef cppclass Hexagonal[T](Lattice):
-        Hexagonal(size_t len_, size_t id_) except +
+        Hexagonal(size_t len_, size_t id_)
 
 cdef extern from "Square.h":
     cdef cppclass Square[T](Lattice):
-        Square(size_t len_, size_t id_) except +
+        Square(size_t len_, size_t id_)
 
 cdef extern from "Triangular.h":
     cdef cppclass Triangular[T](Lattice):
-        Triangular(size_t len_, size_t id_) except +
+        Triangular(size_t len_, size_t id_)
 
 cdef extern from "UJack.h":
     cdef cppclass UJack[T](Lattice):
-        UJack(size_t len_, size_t id_) except +
+        UJack(size_t len_, size_t id_)
 
 cdef extern from "Cubic.h":
     cdef cppclass Cubic[T](Lattice):
-        Cubic(size_t len_, size_t id_) except +
+        Cubic(size_t len_, size_t id_)
 
 cdef extern from "BCC.h":
     cdef cppclass BCC[T](Lattice):
-        BCC(size_t len_, size_t id_) except +
+        BCC(size_t len_, size_t id_)
 
 cdef extern from "Cubic4d.h":
     cdef cppclass Cubic4d[T](Lattice):
-        Cubic4d(size_t len_, size_t id_) except +
+        Cubic4d(size_t len_, size_t id_)
 
 cdef extern from "FixedZ.h":
     cdef cppclass FixedZ(Lattice):
-        FixedZ(size_t len_, size_t id_, size_t z) except +
+        FixedZ(size_t len_, size_t id_, size_t z)
 
 cdef extern from "SquRand.h":
     cdef cppclass SquRand(Lattice):
-        SquRand(size_t len_, size_t id_, double fb) except +
+        SquRand(size_t len_, size_t id_, double fb)
 
 cdef extern from "TriRand.h":
     cdef cppclass TriRand(Lattice):
-        TriRand(size_t len_, size_t id_, double fb) except +
+        TriRand(size_t len_, size_t id_, double fb)
 
 cdef extern from "CubRand.h":
     cdef cppclass CubRand(Lattice):
-        CubRand(size_t len_, size_t id_, double fb) except +
+        CubRand(size_t len_, size_t id_, double fb)
 
 cdef extern from "SWNetwork.h":
     cdef cppclass SWNetwork(Lattice):
-        SWNetwork(size_t nsites, size_t id_, size_t dim, double alpha, double gamma) except +
+        SWNetwork(size_t nsites, size_t id_, size_t dim, double alpha, double gamma)
