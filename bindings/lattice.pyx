@@ -1,5 +1,8 @@
 # distutils: language = c++
 
+import numpy as np
+from cython.view cimport array as cvarray
+
 from Lattice cimport (
     Lattice,                                # Base Class
     Hexagonal, Square, Triangular, UJack,   # Regular2d
@@ -91,7 +94,7 @@ cdef class __LatticeMixin:
 
     # These are to make the Python code easier to use
 
-    def getCoords(self, i):
+    cpdef getCoords(self, i):
         """ Get the coordinates coresponding to a lattice point. 
 
         Any lattice that is not 2, 3, or 4 dimensions is treated as
@@ -111,6 +114,21 @@ cdef class __LatticeMixin:
             p2 = new Point2d(i, self._p.getLength())
             t = (p2.x, p2.y)
         return t
+
+    def getCoordsArray(self):
+        """ Get the coordinates for all sites as an array.
+
+        The shape of the array is (number of sites, number of dimensions).
+
+        """
+        cdef int i;
+        cdef size_t nsites = self._p.getNumSites()
+        cdef size_t dims = self._p.getDims()
+        arr = np.empty((nsites, dims), dtype=np.uintp)
+        # This is not the fastest way to do this, but it is straighforward.
+        for i in range(nsites):
+            arr[i, :] = self.getCoords(i)
+        return arr
 
     def iter_nbrs(self, i):
         n = self._p.getNumNeighbors(i)
