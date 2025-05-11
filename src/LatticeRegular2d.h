@@ -17,12 +17,14 @@ class LatticeRegular2d: public LatticeRegular
 {
     public:
         LatticeRegular2d(size_t len, size_t id=0, size_t nn=0)
-        : LatticeRegular(len*len, id, nn) {
+        : LatticeRegular(len*len, id, nn)
+        {
            length = static_cast< size_t >(ceil(sqrt(num_sites)));
            b = length - 1;
         }
         virtual ~LatticeRegular2d() {}
 
+        size_t getDims() {return 2;}
         /* virtual functions */
         virtual bool isSpanning(size_t = 1);
 

@@ -22,6 +22,7 @@ class LatticeRegular3d: public LatticeRegular
         }
         virtual ~LatticeRegular3d() {}
 
+        size_t getDims() {return 3;}
         /* virtual functions */
         virtual bool isSpanning(size_t = 1);
 

@@ -30,9 +30,8 @@ class CubRand: public LatticeRandom
         virtual void generateBonds();
         virtual void activateSites();
         
-        virtual size_t getNumNeighbors(size_t) {
-            return max_neighbors;
-        }
+        virtual size_t getNumNeighbors(size_t) {return max_neighbors;}
+        size_t getDims() {return 3;}
 
     private:
         double f;

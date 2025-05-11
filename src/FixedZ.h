@@ -31,6 +31,7 @@ class FixedZ: public LatticeRandom
          virtual void activateSites();
 
          virtual size_t getNumNeighbors( size_t); 
+        size_t getDims() {return 2;}
 
     private:
          void Setup(size_t z);

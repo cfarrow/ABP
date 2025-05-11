@@ -20,6 +20,7 @@ class LatticeRegular4d: public LatticeRegular
         }
         virtual ~LatticeRegular4d() {}
 
+        size_t getDims() {return 4;}
          /* virtual functions */
         virtual bool isSpanning(size_t = 1);
 

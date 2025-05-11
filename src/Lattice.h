@@ -91,6 +91,7 @@ class Lattice
           virtual size_t getNbr(size_t, size_t) = 0;
           virtual Neighbors getNbrs(size_t, bool) = 0;
           virtual Neighbors getNbrs(size_t) = 0;
+          virtual size_t getDims() = 0;
 
      protected: /* These are direcly callable/mutable by derived classes */
           size_t length;			/* length of lattice - if applicable */

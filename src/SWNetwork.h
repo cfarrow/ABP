@@ -42,6 +42,7 @@ class SWNetwork: public LatticeRandom
         virtual void generateBonds();
         virtual void activateSites();
         virtual size_t getNumNeighbors(size_t);
+        size_t getDims() {return dim;}
 
     private:
         size_t dim;

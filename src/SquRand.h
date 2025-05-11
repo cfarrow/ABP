@@ -27,9 +27,8 @@ class SquRand: public LatticeRandom
          virtual void generateBonds();
          virtual void activateSites();
 
-         virtual size_t getNumNeighbors(size_t) {
-             return max_neighbors;
-         }
+         virtual size_t getNumNeighbors(size_t) {return max_neighbors;}
+         size_t getDims() {return 2;}
 
     private:
          double f;
