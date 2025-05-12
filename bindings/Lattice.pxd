@@ -82,6 +82,9 @@ cdef extern from "Point.h":
 cdef extern from "Lattice.h":
     cdef cppclass Lattice:
         Lattice(size_t len_, size_t id_)
+        
+        void activateSites() nogil 
+        void labelClusters(size_t) nogil
         size_t getDims() nogil
         size_t getLength() nogil
         size_t getNumSites() nogil

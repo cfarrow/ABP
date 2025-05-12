@@ -16,3 +16,13 @@ package-dir = {"" = "."}
 ext-modules = [
     {name = "ABPy.lattice", sources = ["./bindings/lattice.pyx"]},
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["ABPy/tests"]
+python_files = "test_*.py"
+python_functions = "test_*"

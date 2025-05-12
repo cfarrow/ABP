@@ -81,6 +81,13 @@ cdef class __LatticeMixin:
     def __dealloc__(self):
         del self._p
 
+    def activateSites(self):
+        """ Set all sites to active and present. """
+        self._p.activateSites()
+
+    def labelClusters(self, i=1):
+        self._p.labelClusters(i)
+
     def getLength(self):
         return self._p.getLength()
 
@@ -171,18 +178,49 @@ cdef class __LatticeMixin:
             populate_coords_2d(length, nsites, mem)
         return mem
 
-    def iter_nbrs(self, i):
-        """ Iterate of the neighbors of site `i` """
+    def _has_flags(self, s, active=None, present=None):
+        passed = True
+        if active is not None:
+            passed = passed and (active == self._p.isActive(s))
+        if present is not None:
+            passed = passed and (present == self._p.isPresent(s))
+        return passed
+
+    def iter_nbrs(self, i, *, active=None, present=None):
+        """ Iterate of the neighbors of site `i` 
+
+        If `active` is True or False, this will only yield neighbors with the
+        corresponding activity flag. Ditto for `present`. Both flags being set
+        is treated as _and_ logic.
+        
+        """
         n = self._p.getNumNeighbors(i)
         for j in range(n):
-            yield self._p.getNbr(i, j)
+            s = self._p.getNbr(i, j)
+            if self._has_flags(s, active, present):
+                yield s
 
-    def iter_edges(self):
-        """ Iterate over all edges, removing symmetric dupicates. """
-        for i in self:
-            for j in self.iter_neighbors(i):
-                if i < j:
-                    yield (i, j)
+    def iter_edges(self, *, active=None, present=None):
+        """ Iterate over all edges, removing symmetric dupicates. 
+
+        If `active` is True or False, this will only yield edges where the sites
+        that make up the edges have the corresponding activity flag. Ditto for
+        `present`. Both flags being set is treated as _and_ logic.
+        
+        """
+        cdef size_t length = self._p.getLength()
+        cdef size_t nsites = self._p.getNumSites()
+        cdef size_t dims = self._p.getDims()
+
+        for s1 in range(self._p.getNumSites()):
+            if not self._has_flags(s1, active, present):
+                continue
+
+            n = self._p.getNumNeighbors(s1)
+            for j in range(n):
+                s2 = self._p.getNbr(s1, j)
+                if s1 < s2 and self._has_flags(s2, active, present):
+                    yield (s1, s2)
 
     def __len__(self):
         return self._p.getNumSites()
