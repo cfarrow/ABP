@@ -1,11 +1,27 @@
 """ Procedures for ABP. """
 from random import randint
 
+from .lattice import LatticeBase
 
-def remove_active_site(l):
-    """ Mark an active site as inactive. Returns list of deactivated sites. 
 
-    Raises ValueError if there are no sites to remove.
+def remove_active_site(l : LatticeBase):
+    """ Mark an active site as inactive. 
+
+    Parameters
+    ----------
+    l : LatticeBase
+        The lattice to operate upon.
+
+    Raises 
+    ------
+    ValueError 
+        If there are no active sites.
+
+    Returns
+    -------
+    sites : list[int]
+        Sites marked as inactive (there is only one)
+    
     
     """
     sites = []
@@ -21,7 +37,7 @@ def remove_active_site(l):
     return sites
 
 
-def cull_sites(l, sites : list[int], mcull : int):
+def cull_sites(l : LatticeBase, sites : list[int], mcull : int):
     """ Iterative deactivate sites with fewer than mcull active neighbors.
 
     For efficiency, the algorithm must be seeded with list of inactive sites.
@@ -29,16 +45,24 @@ def cull_sites(l, sites : list[int], mcull : int):
     return value from that call to iteratively cull sites connected to that seed
     site.
 
+    The algorith is iterative. If any sites are removed by culling, their
+    neighbors will be checked agains the culling condition and culled if they do
+    not meet it. This continues until no additional sites can be removed.
+
     Parameters
     ----------
-    l : Lattice
-    sites : list of integer
-    mcull : the culling parameter
+    l : LatticeBase
+        The lattice to operate upon
+    sites : list[int]
+        Sites to seed the culling.
+    mcull : int
+        The culling parameter. Sites with fewer than this number of active
+        neighbors will be set as inactive.
 
     Returns
     -------
-    culled_sites : list of integer
-        Sites removed by the algorithm, including the seed sites.
+    culled_sites : list[int]
+        Sites removed by culling, including the seed sites.
 
     """
 

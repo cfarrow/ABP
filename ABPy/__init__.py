@@ -6,6 +6,7 @@ __all__ = [
     "FixedZLattice",
     "SquRandLattice", "TriRandLattice", "CubRandLattice",
     "SWNLattice",
+    "cull_sites", "remove_active_site",
 ]
 
 from .lattice import (
@@ -16,3 +17,5 @@ from .lattice import (
     SquRandLattice, TriRandLattice, CubRandLattice,
     SWNLattice,
 )
+
+from .algo import cull_sites, remove_active_site

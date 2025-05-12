@@ -1,5 +1,8 @@
 # distutils: language = c++
 
+from collections.abc import Buffer
+from typing import Iterator, Union
+
 cimport cython
 from cython.view cimport array as cvarray
 
@@ -65,14 +68,10 @@ cdef void populate_coords_2d(size_t length, size_t nsites, size_t[:, ::1] coords
         coords[i, 1] = p2.y
 
 
-cdef class __LatticeMixin:
-    """ All the python methods that come with being a Lattice. 
+cdef class LatticeBase:
+    """ Base class for all lattices. 
     
-    This cannot be used directly. Classes derived from Lattice that are to be
-    exposed to Python must derive from this class and provide a __cinit__ method
-    that creates and stores an instance of the lattice type. 
-
-    See TriangularLattice for an example.
+    This cannot be instantiated but is useful in type declarations.
     
     """
 
@@ -85,63 +84,63 @@ cdef class __LatticeMixin:
         """ Set all sites to active and present. """
         self._p.activateSites()
 
-    def labelClusters(self, i=1):
+    def labelClusters(self, i : int=1):
         self._p.labelClusters(i)
 
-    def getLength(self):
+    def getLength(self) -> int:
         return self._p.getLength()
 
-    def getNumSites(self):
+    def getNumSites(self) -> int:
         return self._p.getNumSites()
 
-    def getNumActive(self):
+    def getNumActive(self) -> int:
         return self._p.getNumActive()
 
-    def getNumPresent(self):
+    def getNumPresent(self) -> int:
         return self._p.getNumPresent()
 
-    def getNumClusters(self):
+    def getNumClusters(self) -> int:
         return self._p.getNumClusters()
 
-    def getMaxMass(self):
+    def getMaxMass(self) -> int:
         return self._p.getMaxMass()
 
-    def isActive(self, i):
+    def isActive(self, i : int) -> bool:
         return self._p.isActive(i)
 
-    def isPresent(self, i):
+    def isPresent(self, i : int) -> bool:
         return self._p.isPresent(i)
 
-    def setActiveLevel(self, i, level):
+    def setActiveLevel(self, i : int, level : bool):
         return self._p.setActiveLevel(i, level)
 
-    def setPresentLevel(self, i, level):
+    def setPresentLevel(self, i : int, level : bool):
         return self._p.setPresentLevel(i, level)
 
-    def getClusterLabel(self, i):
+    def getClusterLabel(self, i : int) -> int:
         return self._p.getClusterLabel(i)
 
-    def getClusterSize(self, c):
+    def getClusterSize(self, c : int) -> int:
         return self._p.getClusterSize(c)
 
-    def isSpanning(self, c):
+    def isSpanning(self, c : int) -> bool:
         return self._p.isSpanning(c)
 
-    def getNumNeighbors(self, i):
+    def getNumNeighbors(self, i : int) -> int:
         return self._p.getNumNeighbors(i)
 
-    def getNbr(self, i, j):
+    def getNbr(self, i : int, j : int) -> int:
         return self._p.getNbr(i, j)
 
-    def getNumActiveNeighbors(self, i):
+    def getNumActiveNeighbors(self, i : int) -> int:
         return self._p.getNumActiveNeighbors(i)
 
-    def getDims(self):
+    def getDims(self) -> int:
         return self._p.getDims()
 
     # These are to make the Python code easier to use
 
-    cpdef getCoords(self, i):
+    def getCoords(self, i : int) -> Union[tuple[int, int], tuple[int, int, int], tuple[int, int, int, int]]:
         """ Get the coordinates coresponding to a lattice point. 
 
         Any lattice that is not 2, 3, or 4 dimensions is treated as
@@ -160,10 +159,10 @@ cdef class __LatticeMixin:
             t = (p2.x, p2.y)
         return t
 
-    def getCoordsArray(self):
-        """ Get the coordinates for all sites as an array.
+    def getCoordsArray(self) -> Buffer:
+        """ Get the coordinates for all sites as a cython memoryview (buffer).
 
-        The shape of the array is (number of sites, number of dimensions).
+        The shape of the buffer is (number of sites, number of dimensions).
 
         """
         cdef size_t length = self._p.getLength()
@@ -186,7 +185,7 @@ cdef class __LatticeMixin:
             passed = passed and (present == self._p.isPresent(s))
         return passed
 
-    def iter_nbrs(self, i, *, active=None, present=None):
+    def iter_nbrs(self, i : int, *, active : Union[bool, None]=None, present : Union[bool, None]=None) -> Iterator[int]:
         """ Iterate of the neighbors of site `i` 
 
         If `active` is True or False, this will only yield neighbors with the
@@ -200,7 +199,7 @@ cdef class __LatticeMixin:
             if self._has_flags(s, active, present):
                 yield s
 
-    def iter_edges(self, *, active=None, present=None):
+    def iter_edges(self, *, active : Union[bool, None]=None, present : Union[bool, None]=None) -> Iterator[tuple[int, int]]:
         """ Iterate over all edges, removing symmetric dupicates. 
 
         If `active` is True or False, this will only yield edges where the sites
@@ -222,7 +221,7 @@ cdef class __LatticeMixin:
                 if s1 < s2 and self._has_flags(s2, active, present):
                     yield (s1, s2)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._p.getNumSites()
 
     def __iter__(self):
@@ -232,7 +231,7 @@ cdef class __LatticeMixin:
 
 # 2D Regular Lattices
 
-cdef class HexagonalLattice(__LatticeMixin):
+cdef class HexagonalLattice(LatticeBase):
 
     def __cinit__(self, size_t len_, unsigned short pbc):
         if pbc == 0:
@@ -243,7 +242,7 @@ cdef class HexagonalLattice(__LatticeMixin):
             self._p = new Hexagonal[T2](len_, 0)
 
 
-cdef class SquareLattice(__LatticeMixin):
+cdef class SquareLattice(LatticeBase):
 
     def __cinit__(self, size_t len_, unsigned short pbc):
         if pbc == 0:
@@ -254,7 +253,7 @@ cdef class SquareLattice(__LatticeMixin):
             self._p = new Square[T2](len_, 0)
 
 
-cdef class TriangularLattice(__LatticeMixin):
+cdef class TriangularLattice(LatticeBase):
 
     def __cinit__(self, size_t len_, unsigned short pbc):
         if pbc == 0:
@@ -265,7 +264,7 @@ cdef class TriangularLattice(__LatticeMixin):
             self._p = new Triangular[T2](len_, 0)
 
 
-cdef class UJackLattice(__LatticeMixin):
+cdef class UJackLattice(LatticeBase):
 
     def __cinit__(self, size_t len_, unsigned short pbc):
         if pbc == 0:
@@ -276,7 +275,7 @@ cdef class UJackLattice(__LatticeMixin):
             self._p = new UJack[T2](len_, 0)
 
 
-cdef class CubicLattice(__LatticeMixin):
+cdef class CubicLattice(LatticeBase):
 
     def __cinit__(self, size_t len_, unsigned short pbc):
         if pbc == 0:
@@ -289,7 +288,7 @@ cdef class CubicLattice(__LatticeMixin):
             self._p = new Cubic[T3](len_, 0)
 
 
-cdef class BCCLattice(__LatticeMixin):
+cdef class BCCLattice(LatticeBase):
 
     def __cinit__(self, size_t len_, unsigned short pbc):
         if pbc == 0:
@@ -302,7 +301,7 @@ cdef class BCCLattice(__LatticeMixin):
             self._p = new BCC[T3](len_, 0)
 
 
-cdef class Cubic4dLattice(__LatticeMixin):
+cdef class Cubic4dLattice(LatticeBase):
 
     def __cinit__(self, size_t len_, unsigned short pbc):
         if pbc == 0:
@@ -317,31 +316,31 @@ cdef class Cubic4dLattice(__LatticeMixin):
             self._p = new Cubic4d[T4](len_, 0)
 
 
-cdef class FixedZLattice(__LatticeMixin):
+cdef class FixedZLattice(LatticeBase):
 
     def __cinit__(self, size_t len_, size_t z):
         self._p = new FixedZ(len_, 0, z)
 
 
-cdef class SquRandLattice(__LatticeMixin):
+cdef class SquRandLattice(LatticeBase):
 
     def __cinit__(self, size_t len_, double fb):
         self._p = new SquRand(len_, 0, fb)
 
 
-cdef class TriRandLattice(__LatticeMixin):
+cdef class TriRandLattice(LatticeBase):
 
     def __cinit__(self, size_t len_, double fb):
         self._p = new TriRand(len_, 0, fb)
 
 
-cdef class CubRandLattice(__LatticeMixin):
+cdef class CubRandLattice(LatticeBase):
 
     def __cinit__(self, size_t len_, double fb):
         self._p = new CubRand(len_, 0, fb)
 
 
-cdef class SWNLattice(__LatticeMixin):
+cdef class SWNLattice(LatticeBase):
 
     def __cinit__(self, size_t nsites, size_t dim, double alpha, double gamma):
         self._p = new SWNetwork(nsites, 0, dim, alpha, gamma)
