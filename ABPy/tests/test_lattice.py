@@ -1,7 +1,5 @@
 from ABPy import lattice
 
-import pytest
-
 
 def test_iter_nbrs():
     l = lattice.SquareLattice(8, 2)
